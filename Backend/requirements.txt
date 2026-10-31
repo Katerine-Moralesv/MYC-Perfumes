@@ -1,0 +1,13 @@
+Django==6.1.1
+djangorestframework==3.18.3
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.4.0
+django-filter==24.3
+python-decouple==3.8
+psycopg[binary]==3.3.6
+Pillow==13.0.0
+gunicorn
+whitenoise
+dj-database-url
+django-storages[s3]==1.14.6
+boto3==1.43.123

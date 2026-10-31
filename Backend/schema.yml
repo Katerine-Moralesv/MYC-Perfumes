@@ -1,0 +1,2243 @@
+openapi: 3.0.3
+info:
+  title: MYC Perfumes API
+  version: 1.0.0
+  description: API para la gestión de usuarios, catálogo, ventas, abonos, clientes
+    y pedidos de MYC Perfumes.
+paths:
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      description: Login JWT con rate limiting.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/v1/auth/refresh/:
+    post:
+      operationId: v1_auth_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/catalogo/categorias/:
+    get:
+      operationId: v1_catalogo_categorias_list
+      description: |-
+        GET  -> Público.
+        POST -> Solo administrador.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+          description: ''
+    post:
+      operationId: v1_catalogo_categorias_create
+      description: |-
+        GET  -> Público.
+        POST -> Solo administrador.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+  /api/v1/catalogo/categorias/{id}/:
+    get:
+      operationId: v1_catalogo_categorias_retrieve
+      description: |-
+        GET    -> Público.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+    put:
+      operationId: v1_catalogo_categorias_update
+      description: |-
+        GET    -> Público.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Categoria'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+    patch:
+      operationId: v1_catalogo_categorias_partial_update
+      description: |-
+        GET    -> Público.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoria'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoria'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoria'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+          description: ''
+    delete:
+      operationId: v1_catalogo_categorias_destroy
+      description: |-
+        GET    -> Público.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/catalogo/familias-olfativas/:
+    get:
+      operationId: v1_catalogo_familias_olfativas_list
+      description: |-
+        GET  -> Público.
+        POST -> Solo administrador.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamiliaOlfativa'
+          description: ''
+    post:
+      operationId: v1_catalogo_familias_olfativas_create
+      description: |-
+        GET  -> Público.
+        POST -> Solo administrador.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamiliaOlfativa'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamiliaOlfativa'
+          description: ''
+  /api/v1/catalogo/familias-olfativas/{id}/:
+    get:
+      operationId: v1_catalogo_familias_olfativas_retrieve
+      description: |-
+        GET    -> Público.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamiliaOlfativa'
+          description: ''
+    put:
+      operationId: v1_catalogo_familias_olfativas_update
+      description: Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamiliaOlfativa'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamiliaOlfativa'
+          description: ''
+    patch:
+      operationId: v1_catalogo_familias_olfativas_partial_update
+      description: Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFamiliaOlfativa'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FamiliaOlfativa'
+          description: ''
+    delete:
+      operationId: v1_catalogo_familias_olfativas_destroy
+      description: Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/catalogo/presentaciones/:
+    get:
+      operationId: v1_catalogo_presentaciones_list
+      description: |-
+        Configuración interna de porcentajes de recarga.
+        No forma parte del catálogo público. Solo administrador.
+      parameters:
+      - in: query
+        name: producto
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Presentacion'
+          description: ''
+    post:
+      operationId: v1_catalogo_presentaciones_create
+      description: Configuración interna. Solo administrador.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Presentacion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Presentacion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Presentacion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentacion'
+          description: ''
+  /api/v1/catalogo/presentaciones/{id}/:
+    get:
+      operationId: v1_catalogo_presentaciones_retrieve
+      description: Configuración interna. Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentacion'
+          description: ''
+    put:
+      operationId: v1_catalogo_presentaciones_update
+      description: Configuración interna. Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Presentacion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Presentacion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Presentacion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentacion'
+          description: ''
+    patch:
+      operationId: v1_catalogo_presentaciones_partial_update
+      description: Configuración interna. Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPresentacion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPresentacion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPresentacion'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentacion'
+          description: ''
+    delete:
+      operationId: v1_catalogo_presentaciones_destroy
+      description: Configuración interna. Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/catalogo/productos/:
+    get:
+      operationId: v1_catalogo_productos_list
+      description: |-
+        GET  -> Catálogo público: productos activos con precio asignado.
+        POST -> Solo administrador.
+        Filtros públicos: categoria, categoria_nombre y familias_olfativas
+        (IDs separados por coma). No se exponen porcentajes internos.
+      parameters:
+      - in: query
+        name: categoria
+        description: ID del público objetivo.
+        schema:
+          type: integer
+      - in: query
+        name: categoria_nombre
+        description: Nombre del público objetivo (Mujer, Hombre, Unisex).
+        schema:
+          type: string
+      - in: query
+        name: familias_olfativas
+        description: IDs de familias olfativas separados por coma.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+          description: ''
+    post:
+      operationId: v1_catalogo_productos_create
+      description: |-
+        GET  -> Catálogo público: productos activos con precio asignado.
+        POST -> Solo administrador.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Producto'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Producto'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Producto'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+          description: ''
+  /api/v1/catalogo/productos/{id}/:
+    get:
+      operationId: v1_catalogo_productos_retrieve
+      description: |-
+        GET    -> Público solo para productos activos con precio asignado.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+          description: ''
+    put:
+      operationId: v1_catalogo_productos_update
+      description: |-
+        GET    -> Público solo para productos activos con precio asignado.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Producto'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Producto'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Producto'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+          description: ''
+    patch:
+      operationId: v1_catalogo_productos_partial_update
+      description: |-
+        GET    -> Público solo para productos activos con precio asignado.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProducto'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProducto'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProducto'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+          description: ''
+    delete:
+      operationId: v1_catalogo_productos_destroy
+      description: |-
+        GET    -> Público solo para productos activos con precio asignado.
+        PUT    -> Solo administrador.
+        PATCH  -> Solo administrador.
+        DELETE -> Solo administrador.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/finanzas/clientes/:
+    get:
+      operationId: v1_finanzas_clientes_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Qué campo usar para ordenar los resultados.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cliente'
+          description: ''
+    post:
+      operationId: v1_finanzas_clientes_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Cliente'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+          description: ''
+  /api/v1/finanzas/compras/:
+    get:
+      operationId: v1_finanzas_compras_list
+      parameters:
+      - in: query
+        name: proveedor
+        schema:
+          type: integer
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Compra'
+          description: ''
+  /api/v1/finanzas/compras/registrar/:
+    post:
+      operationId: v1_finanzas_compras_registrar_create
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/proveedores/:
+    get:
+      operationId: v1_finanzas_proveedores_list
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proveedor'
+          description: ''
+    post:
+      operationId: v1_finanzas_proveedores_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proveedor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Proveedor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Proveedor'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+          description: ''
+  /api/v1/finanzas/proveedores/{id}/:
+    get:
+      operationId: v1_finanzas_proveedores_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+          description: ''
+    put:
+      operationId: v1_finanzas_proveedores_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Proveedor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Proveedor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Proveedor'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+          description: ''
+    patch:
+      operationId: v1_finanzas_proveedores_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProveedor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProveedor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProveedor'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+          description: ''
+  /api/v1/finanzas/reportes/balance/:
+    get:
+      operationId: v1_finanzas_reportes_balance_retrieve
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/reportes/clientes-con-saldo/:
+    get:
+      operationId: v1_finanzas_reportes_clientes_con_saldo_retrieve
+      description: Solo administradores y superusuarios.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/reportes/ganancia-por-producto/:
+    get:
+      operationId: v1_finanzas_reportes_ganancia_por_producto_retrieve
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/reportes/resumen-mensual/:
+    get:
+      operationId: v1_finanzas_reportes_resumen_mensual_retrieve
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/ventas/:
+    get:
+      operationId: v1_finanzas_ventas_list
+      description: |-
+        Administrador/superusuario: todas las ventas.
+        Vendedor: únicamente las ventas que registró.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Venta'
+          description: ''
+  /api/v1/finanzas/ventas/{venta_id}/:
+    get:
+      operationId: v1_finanzas_ventas_retrieve
+      description: |-
+        Administrador/superusuario: cualquier venta.
+        Vendedor: únicamente una venta registrada por él.
+      parameters:
+      - in: path
+        name: venta_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/ventas/{venta_id}/abonos/:
+    post:
+      operationId: v1_finanzas_ventas_abonos_create
+      description: |-
+        Administrador/superusuario: cualquier venta.
+        Vendedor: únicamente una venta registrada por él.
+      parameters:
+      - in: path
+        name: venta_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/finanzas/ventas/registrar/:
+    post:
+      operationId: v1_finanzas_ventas_registrar_create
+      description: Administrador o vendedor autenticado.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/pedidos/:
+    get:
+      operationId: v1_pedidos_list
+      description: Solo administradores y superusuarios.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pedido'
+          description: ''
+  /api/v1/pedidos/{pedido_id}/confirmar/:
+    post:
+      operationId: v1_pedidos_confirmar_create
+      description: |-
+        Solo los administradores pueden confirmar pedidos.
+
+        `lineas_precio` solo debe incluir líneas personalizadas
+        pendientes o que se quieran corregir antes de confirmar.
+        Los precios de las líneas normales se conservan desde la
+        captura y no deben reenviarse.
+
+        Si falta el costo de compra de alguna presentación, la venta
+        y el abono no se crean, pero los precios finales enviados se
+        conservan para poder reintentar después de registrar la compra.
+      parameters:
+      - in: path
+        name: pedido_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmarPedido'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+          description: Pedido confirmado con su venta y estado de pago.
+        '400':
+          description: Datos inválidos, precios pendientes o costo faltante.
+        '403':
+          description: Solo un administrador puede confirmar pedidos.
+  /api/v1/pedidos/{pedido_id}/rechazar/:
+    post:
+      operationId: v1_pedidos_rechazar_create
+      description: Solo los administradores pueden rechazar pedidos.
+      parameters:
+      - in: path
+        name: pedido_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/pedidos/webhook/:
+    post:
+      operationId: v1_pedidos_webhook_create
+      description: |-
+        Endpoint público utilizado por el bot de WhatsApp.
+
+        No utiliza JWT porque el bot no es un usuario de la aplicación.
+        En su lugar exige un token secreto enviado mediante:
+            X-Webhook-Token: <token>
+
+        También tiene rate limiting para reducir abuso básico.
+      tags:
+      - v1
+      security: []
+      parameters:
+      - in: header
+        name: X-Webhook-Token
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrarPedido'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+          description: Pedido registrado en estado pendiente.
+        '400':
+          description: Datos inválidos.
+        '401':
+          description: Token de webhook inválido.
+        '503':
+          description: Webhook no configurado.
+  /api/v1/usuarios/password/restablecer/:
+    post:
+      operationId: v1_usuarios_password_restablecer_create
+      description: |-
+        Establece una nueva contraseña utilizando
+        un token temporal previamente verificado.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/usuarios/password/solicitar/:
+    post:
+      operationId: v1_usuarios_password_solicitar_create
+      description: |-
+        Solicita un código temporal de recuperación de contraseña.
+
+        Por seguridad, la respuesta no revela si el correo existe.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/usuarios/password/verificar/:
+    post:
+      operationId: v1_usuarios_password_verificar_create
+      description: |-
+        Verifica el código recibido por correo.
+
+        Si es válido, genera un token temporal para
+        completar el cambio de contraseña.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/usuarios/perfil/:
+    get:
+      operationId: v1_usuarios_perfil_retrieve
+      description: Permite al usuario consultar y editar únicamente su propio perfil.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioPerfil'
+          description: ''
+    put:
+      operationId: v1_usuarios_perfil_update
+      description: Permite al usuario consultar y editar únicamente su propio perfil.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioPerfil'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioPerfil'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioPerfil'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioPerfil'
+          description: ''
+    patch:
+      operationId: v1_usuarios_perfil_partial_update
+      description: Permite al usuario consultar y editar únicamente su propio perfil.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioPerfil'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioPerfil'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioPerfil'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioPerfil'
+          description: ''
+  /api/v1/usuarios/usuarios/:
+    get:
+      operationId: v1_usuarios_usuarios_list
+      description: |-
+        CRUD administrativo:
+        permite consultar y crear usuarios.
+
+        Solo administradores.
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioAdmin'
+          description: ''
+    post:
+      operationId: v1_usuarios_usuarios_create
+      description: |-
+        CRUD administrativo:
+        permite consultar y crear usuarios.
+
+        Solo administradores.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioAdmin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioAdmin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioAdmin'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioAdmin'
+          description: ''
+  /api/v1/usuarios/usuarios/{id}/:
+    get:
+      operationId: v1_usuarios_usuarios_retrieve
+      description: |-
+        CRUD administrativo:
+        permite consultar, editar y eliminar usuarios.
+
+        Solo administradores.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioAdmin'
+          description: ''
+    put:
+      operationId: v1_usuarios_usuarios_update
+      description: |-
+        CRUD administrativo:
+        permite consultar, editar y eliminar usuarios.
+
+        Solo administradores.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioAdmin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UsuarioAdmin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UsuarioAdmin'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioAdmin'
+          description: ''
+    patch:
+      operationId: v1_usuarios_usuarios_partial_update
+      description: |-
+        CRUD administrativo:
+        permite consultar, editar y eliminar usuarios.
+
+        Solo administradores.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioAdmin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioAdmin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUsuarioAdmin'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioAdmin'
+          description: ''
+    delete:
+      operationId: v1_usuarios_usuarios_destroy
+      description: |-
+        CRUD administrativo:
+        permite consultar, editar y eliminar usuarios.
+
+        Solo administradores.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Abono:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        monto:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        fecha:
+          type: string
+          format: date
+        registrado_por:
+          type: integer
+          readOnly: true
+      required:
+      - fecha
+      - id
+      - monto
+      - registrado_por
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - nombre
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 150
+        telefono:
+          type: string
+          maxLength: 20
+        notas:
+          type: string
+      required:
+      - id
+      - nombre
+    Compra:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        proveedor:
+          type: integer
+        proveedor_nombre:
+          type: string
+          readOnly: true
+        fecha:
+          type: string
+          format: date
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DetalleCompra'
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - creado_en
+      - detalles
+      - fecha
+      - id
+      - proveedor
+      - proveedor_nombre
+    DetalleCompra:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        presentacion:
+          type: integer
+        producto_nombre:
+          type: string
+          readOnly: true
+        porcentaje:
+          type: integer
+          readOnly: true
+        cantidad:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        costo_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - cantidad
+      - costo_unitario
+      - id
+      - porcentaje
+      - presentacion
+      - producto_nombre
+      - subtotal
+    ConfirmarPedido:
+      type: object
+      properties:
+        estado_pago:
+          type: string
+          enum:
+          - pagado
+          - abonado
+          - pendiente
+        lineas_precio:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineaPrecio'
+        monto_recibido:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+      required:
+      - estado_pago
+    DetallePedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producto:
+          type: integer
+          readOnly: true
+          nullable: true
+        producto_nombre:
+          type: string
+          readOnly: true
+          nullable: true
+        presentacion:
+          type: integer
+          readOnly: true
+          nullable: true
+          description: |-
+            Solo aparece en pedidos históricos que conservaron una
+            presentación. Los pedidos nuevos no exponen esta clave.
+        porcentaje_recarga:
+          type: integer
+          readOnly: true
+        recarga_solicitada:
+          type: boolean
+          readOnly: true
+        cantidad:
+          type: integer
+          readOnly: true
+        precio_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        precio_pendiente:
+          type: boolean
+          readOnly: true
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - cantidad
+      - id
+      - porcentaje_recarga
+      - precio_pendiente
+      - precio_unitario
+      - producto
+      - producto_nombre
+      - recarga_solicitada
+      - subtotal
+    DetalleVenta:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        presentacion:
+          type: integer
+        producto_nombre:
+          type: string
+          readOnly: true
+        porcentaje:
+          type: integer
+          readOnly: true
+        cantidad:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        precio_venta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        costo_unitario:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        subtotal:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        ganancia:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+      required:
+      - cantidad
+      - costo_unitario
+      - ganancia
+      - id
+      - porcentaje
+      - precio_venta
+      - presentacion
+      - producto_nombre
+      - subtotal
+    EstadoEnum:
+      enum:
+      - pendiente
+      - confirmado
+      - rechazado
+      type: string
+      description: |-
+        * `pendiente` - Pendiente
+        * `confirmado` - Confirmado
+        * `rechazado` - Rechazado
+    EstadoPagoEnum:
+      enum:
+      - pagado
+      - abonado
+      - pendiente
+      type: string
+      description: |-
+        * `pagado` - Pagado
+        * `abonado` - Abonado
+        * `pendiente` - Pendiente
+    FamiliaOlfativa:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - nombre
+    LineaPedido:
+      type: object
+      description: |-
+        Formato recomendado: producto_id + recarga_solicitada + porcentaje.
+        Si recarga_solicitada es false, el backend asigna 40%.
+        presentacion_id se conserva por compatibilidad con el contrato anterior.
+      properties:
+        producto_id:
+          type: integer
+          minimum: 1
+        recarga_solicitada:
+          type: boolean
+        porcentaje:
+          type: integer
+          enum:
+          - 40
+          - 60
+          - 70
+          - 80
+          nullable: true
+        presentacion_id:
+          type: integer
+          minimum: 1
+        cantidad:
+          type: integer
+          minimum: 1
+          maximum: 100
+      required:
+      - cantidad
+    LineaPrecio:
+      type: object
+      description: |-
+        Usa detalle_id para pedidos nuevos. presentacion_id se conserva
+        por compatibilidad con pedidos antiguos.
+      properties:
+        detalle_id:
+          type: integer
+          minimum: 1
+        presentacion_id:
+          type: integer
+          minimum: 1
+        precio_venta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - precio_venta
+    PatchedFamiliaOlfativa:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+    PatchedCategoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 100
+    PatchedPresentacion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producto:
+          type: integer
+        producto_nombre:
+          type: string
+          readOnly: true
+        porcentaje:
+          allOf:
+          - $ref: '#/components/schemas/PorcentajeEnum'
+          minimum: 0
+          maximum: 32767
+        es_personalizada:
+          type: boolean
+        activo:
+          type: boolean
+    PatchedProducto:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        categoria:
+          type: integer
+          nullable: true
+        categoria_nombre:
+          type: string
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 150
+        descripcion:
+          type: string
+        foto:
+          type: string
+          format: uri
+          nullable: true
+        precio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        dias_entrega:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        activo:
+          type: boolean
+        familias_olfativas:
+          type: array
+          items:
+            type: integer
+        familias_olfativas_nombres:
+          type: array
+          items:
+            type: string
+          readOnly: true
+    PatchedProveedor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 150
+        telefono:
+          type: string
+          maxLength: 20
+        notas:
+          type: string
+        activo:
+          type: boolean
+    PatchedUsuarioAdmin:
+      type: object
+      description: Serializer utilizado por el administrador para crear y editar usuarios.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          title: Dirección de correo electrónico
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        rol:
+          $ref: '#/components/schemas/RolEnum'
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+    PatchedUsuarioPerfil:
+      type: object
+      description: |-
+        Serializer para consultar y editar el perfil propio.
+
+        El usuario solamente puede modificar sus datos personales.
+        No puede modificar su rol ni su estado de activación.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          title: Dirección de correo electrónico
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cliente:
+          type: integer
+          readOnly: true
+        cliente_nombre:
+          type: string
+          readOnly: true
+        telefono_origen:
+          type: string
+          readOnly: true
+        estado:
+          allOf:
+          - $ref: '#/components/schemas/EstadoEnum'
+          readOnly: true
+        venta:
+          type: integer
+          readOnly: true
+          nullable: true
+        estado_pago:
+          type: string
+          readOnly: true
+          nullable: true
+          enum:
+          - pagado
+          - abonado
+          - pendiente
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        saldo:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        monto_pagado:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        precios_completos:
+          type: boolean
+          readOnly: true
+        puede_confirmar:
+          type: boolean
+          readOnly: true
+        motivo_rechazo:
+          type: string
+          readOnly: true
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DetallePedido'
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - cliente
+      - cliente_nombre
+      - creado_en
+      - detalles
+      - estado
+      - estado_pago
+      - id
+      - monto_pagado
+      - motivo_rechazo
+      - precios_completos
+      - puede_confirmar
+      - saldo
+      - telefono_origen
+      - total
+      - venta
+    PorcentajeEnum:
+      enum:
+      - 40
+      - 60
+      - 70
+      - 80
+      type: integer
+      description: |-
+        * `40` - 40% (sin recarga solicitada)
+        * `60` - 60%
+        * `70` - 70%
+        * `80` - 80%
+    Presentacion:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        producto:
+          type: integer
+        producto_nombre:
+          type: string
+          readOnly: true
+        porcentaje:
+          allOf:
+          - $ref: '#/components/schemas/PorcentajeEnum'
+          minimum: 0
+          maximum: 32767
+        es_personalizada:
+          type: boolean
+        activo:
+          type: boolean
+      required:
+      - es_personalizada
+      - id
+      - porcentaje
+      - producto
+      - producto_nombre
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        categoria:
+          type: integer
+          nullable: true
+        categoria_nombre:
+          type: string
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 150
+        descripcion:
+          type: string
+        foto:
+          type: string
+          format: uri
+          nullable: true
+        precio:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        dias_entrega:
+          type: integer
+          maximum: 32767
+          minimum: 0
+        activo:
+          type: boolean
+        familias_olfativas:
+          type: array
+          items:
+            type: integer
+        familias_olfativas_nombres:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - categoria_nombre
+      - id
+      - nombre
+    Proveedor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nombre:
+          type: string
+          maxLength: 150
+        telefono:
+          type: string
+          maxLength: 20
+        notas:
+          type: string
+        activo:
+          type: boolean
+      required:
+      - id
+      - nombre
+    RegistrarPedido:
+      type: object
+      properties:
+        telefono:
+          type: string
+          maxLength: 20
+        nombre_cliente:
+          type: string
+          maxLength: 150
+        lineas:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineaPedido'
+      required:
+      - lineas
+      - telefono
+    RolEnum:
+      enum:
+      - admin
+      - vendedor
+      type: string
+      description: |-
+        * `admin` - Administrador
+        * `vendedor` - Vendedor
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    UsuarioAdmin:
+      type: object
+      description: Serializer utilizado por el administrador para crear y editar usuarios.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          title: Dirección de correo electrónico
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        rol:
+          $ref: '#/components/schemas/RolEnum'
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        is_active:
+          type: boolean
+          title: Activo
+          description: Indica si el usuario debe ser tratado como activo. Desmarque
+            esta opción en lugar de borrar la cuenta.
+      required:
+      - id
+      - username
+    UsuarioPerfil:
+      type: object
+      description: |-
+        Serializer para consultar y editar el perfil propio.
+
+        El usuario solamente puede modificar sus datos personales.
+        No puede modificar su rol ni su estado de activación.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Nombre de usuario
+          description: 'Requerido. 150 carácteres como máximo. Únicamente letras,
+            dígitos y @/./+/-/_ '
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          title: Dirección de correo electrónico
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        first_name:
+          type: string
+          title: Nombre
+          maxLength: 150
+        last_name:
+          type: string
+          title: Apellidos
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+      required:
+      - id
+      - username
+    Venta:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        cliente:
+          type: integer
+        cliente_nombre:
+          type: string
+          readOnly: true
+        fecha:
+          type: string
+          format: date
+        estado_pago:
+          $ref: '#/components/schemas/EstadoPagoEnum'
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        saldo:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        detalles:
+          type: array
+          items:
+            $ref: '#/components/schemas/DetalleVenta'
+          readOnly: true
+        abonos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Abono'
+          readOnly: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - abonos
+      - cliente
+      - cliente_nombre
+      - creado_en
+      - detalles
+      - fecha
+      - id
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,71 @@
+.buscador-sugerencias {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.buscador-sugerencias > input {
+  width: 100%;
+}
+
+.buscador-sugerencias-lista {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  max-height: 260px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid #ead9d4;
+  border-radius: 11px;
+  background: #fffaf7;
+  box-shadow: 0 14px 34px rgba(89, 60, 64, 0.14);
+}
+
+.buscador-sugerencias-opcion {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.buscador-sugerencias-opcion:hover,
+.buscador-sugerencias-opcion.resaltada {
+  background: #fbece9;
+}
+
+.buscador-sugerencias-opcion.seleccionada {
+  background: #f7e4e1;
+}
+
+.buscador-sugerencias-principal {
+  color: #4f4349;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.buscador-sugerencias-descripcion {
+  color: #9a888e;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.buscador-sugerencias-vacio {
+  padding: 12px 10px;
+  color: #998b91;
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .buscador-sugerencias-lista {
+    max-height: 210px;
+  }
+}

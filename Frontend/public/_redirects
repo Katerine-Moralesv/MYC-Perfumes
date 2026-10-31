@@ -1,0 +1,3 @@
+# Fallback SPA para Cloudflare Pages.
+# Permite abrir/recargar rutas como /catalogo o /contacto directamente.
+/* /index.html 200

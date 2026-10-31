@@ -1,0 +1,134 @@
+:root {
+  --color-fondo: #fff9f3;
+  --color-crema: #f5e8d8;
+  --color-rosa: #f3c4c2;
+  --color-durazno: #f6c9b5;
+  --color-principal: #e9a9a5;
+  --color-lavanda: #d9d0e5;
+  --color-salvia: #d8dcc9;
+  --color-texto: #383438;
+  --color-texto-secundario: #6b6263;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.auth-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: var(--color-fondo);
+  color: var(--color-texto-secundario);
+  font-size: 14px;
+}
+
+.auth-loading p {
+  margin: 0;
+}
+
+.auth-loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--color-rosa);
+  border-top-color: var(--color-principal);
+  border-radius: 50%;
+  animation: auth-loading-girar 0.8s linear infinite;
+}
+
+@keyframes auth-loading-girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.app-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 100vh;
+  padding: 28px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  text-align: center;
+}
+
+.app-error-etiqueta {
+  color: #5f6b52;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+.app-error h1 {
+  max-width: 620px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.app-error > p:not(.app-error-etiqueta) {
+  max-width: 520px;
+  margin: 0;
+  color: var(--color-texto-secundario);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.app-error-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.app-error-acciones button {
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid #66715a;
+  border-radius: 9px;
+  background: #66715a;
+  color: #fff9f3;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.app-error-acciones button + button {
+  border-color: #bfc7ad;
+  background: #d8dcc9;
+  color: #383438;
+}
+

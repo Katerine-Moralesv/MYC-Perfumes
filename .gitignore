@@ -1,0 +1,63 @@
+
+# ===================================
+# VARIABLES DE ENTORNO Y SECRETOS
+# ===================================
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# ===================================
+# PYTHON Y DJANGO
+# ===================================
+__pycache__/
+*.py[cod]
+*.sqlite3
+Backend/staticfiles/
+venv/
+.venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ===================================
+# REACT Y NODE
+# ===================================
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+
+# ===================================
+# ARCHIVOS LOCALES Y REGISTROS
+# ===================================
+.DS_Store
+Thumbs.db
+*.log
+
+# ===================================
+# BASES DE DATOS Y RESPALDOS
+# ===================================
+*.sql
+*.dump
+*.bak
+*.sqlite3
+
+# ===================================
+# ARCHIVOS MULTIMEDIA PRIVADOS
+# ===================================
+Backend/media/
+media/
+
+# ===================================
+# EDITORES
+# ===================================
+.vscode/
+.idea/
+
+# Capturas de desarrollo y pruebas
+/capturas/

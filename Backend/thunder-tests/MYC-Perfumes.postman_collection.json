@@ -1,0 +1,3721 @@
+{
+  "info": {
+    "name": "MYC Perfumes - Pruebas manuales backend",
+    "description": "Colección para importar en Thunder Client (formato Postman 2.1). Completar las variables de entorno localmente. No contiene credenciales ni secretos reales.\n\nOrden recomendado: Autenticación -> Catálogo -> Proveedores y compras -> Pedidos -> Confirmación -> Pagos y saldos -> Casos negativos. Ejecutar '01 Login administrador' primero.\n\nLos scripts intentan guardar IDs en variables de entorno. Si tu versión de Thunder Client no ejecuta scripts Postman, copia los IDs desde las respuestas y actualiza las variables manualmente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "af38c96a-73f6-47b5-9681-ec38b9348407"
+  },
+  "item": [
+    {
+      "name": "01 Autenticación",
+      "item": [
+        {
+          "name": "01 Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('accessToken', data.access);",
+                  "pm.environment.set('refreshToken', data.refresh);",
+                  "pm.test('Devuelve access', function () { pm.expect(data.access).to.be.a('string'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Ejecutar primero. Guarda accessToken y refreshToken. Depende de haber creado el administrador y completado adminUsername/adminPassword en el entorno.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Crear vendedor de pruebas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('vendedorId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/usuarios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "usuarios"
+              ]
+            },
+            "description": "Opcional si el vendedor ya existe. Depende del login administrador. Guarda vendedorId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{vendedorUsername}}\",\n  \"email\": \"vendedor-pruebas@example.com\",\n  \"rol\": \"vendedor\",\n  \"password\": \"{{vendedorPassword}}\",\n  \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 Login vendedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('vendedorAccessToken', data.access);",
+                  "pm.test('Guarda token de vendedor', function () { pm.expect(data.access).to.be.a('string'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Depende del paso 02 o de un vendedor existente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{vendedorUsername}}\",\n  \"password\": \"{{vendedorPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 Refrescar token administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('accessToken', data.access);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Depende del login administrador y de refreshToken.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 Perfil con token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/perfil/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "perfil"
+              ]
+            },
+            "description": "Depende de accessToken."
+          },
+          "response": []
+        },
+        {
+          "name": "06 Solicitar recuperación pública",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/password/solicitar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "password",
+                "solicitar"
+              ]
+            },
+            "description": "Debe responder 200 sin Authorization. Antes de la corrección respondía 401. No usa un correo real.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recuperacion-prueba@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 Verificar código público inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/password/verificar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "password",
+                "verificar"
+              ]
+            },
+            "description": "Debe responder 400, nunca 401, sin token.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recuperacion-prueba@example.com\",\n  \"codigo\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 Restablecer contraseña pública inválida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/password/restablecer/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "password",
+                "restablecer"
+              ]
+            },
+            "description": "Debe responder 400, nunca 401, sin token.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recuperacion-prueba@example.com\",\n  \"reset_token\": \"token-invalido-de-prueba\",\n  \"new_password\": \"nueva-clave-123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 Catálogo",
+      "item": [
+        {
+          "name": "01 Crear categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('categoriaId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/categorias/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "categorias"
+              ]
+            },
+            "description": "Depende del login administrador. Guarda categoriaId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Perfumes Pruebas {{runSuffix}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Crear producto A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('productoAId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/productos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "productos"
+              ]
+            },
+            "description": "Depende de categoriaId. Guarda productoAId. Producto usado para pedidos normales.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"{{categoriaId}}\",\n  \"nombre\": \"Perfume A\",\n  \"descripcion\": \"Producto normal de prueba\",\n  \"precio\": \"150000.00\",\n  \"dias_entrega\": 1,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 Crear producto B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('productoBId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/productos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "productos"
+              ]
+            },
+            "description": "Depende de categoriaId. Guarda productoBId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"{{categoriaId}}\",\n  \"nombre\": \"Perfume B\",\n  \"descripcion\": \"Producto normal de prueba\",\n  \"precio\": \"120000.00\",\n  \"dias_entrega\": 1,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 Crear producto C sin costo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('productoCId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/productos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "productos"
+              ]
+            },
+            "description": "Depende de categoriaId. Se usará para el caso de costo faltante. No registrar compra al inicio.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoria\": \"{{categoriaId}}\",\n  \"nombre\": \"Perfume C\",\n  \"descripcion\": \"Personalizado sin compra registrada\",\n  \"precio\": \"160000.00\",\n  \"dias_entrega\": 1,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 Presentación normal A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('presentacionNormalAId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/presentaciones/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "presentaciones"
+              ]
+            },
+            "description": "Depende de productoAId. Guarda presentacionNormalAId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"producto\": \"{{productoAId}}\",\n  \"porcentaje\": 40,\n  \"es_personalizada\": false,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 Presentación personalizada A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('presentacionPersonalizadaAId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/presentaciones/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "presentaciones"
+              ]
+            },
+            "description": "Depende de productoAId. Guarda presentacionPersonalizadaAId. Esta línea inicia con precio 0.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"producto\": \"{{productoAId}}\",\n  \"porcentaje\": 70,\n  \"es_personalizada\": true,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 Presentación normal B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('presentacionNormalBId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/presentaciones/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "presentaciones"
+              ]
+            },
+            "description": "Depende de productoBId. Guarda presentacionNormalBId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"producto\": \"{{productoBId}}\",\n  \"porcentaje\": 40,\n  \"es_personalizada\": false,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 Presentación personalizada C sin costo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('presentacionPersonalizadaCId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/presentaciones/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "presentaciones"
+              ]
+            },
+            "description": "Depende de productoCId. Guarda presentacionPersonalizadaCId. No registrar compra todavía.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"producto\": \"{{productoCId}}\",\n  \"porcentaje\": 80,\n  \"es_personalizada\": true,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 Consultar productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/productos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "productos"
+              ]
+            },
+            "description": "Catálogo público. No modifica datos."
+          },
+          "response": []
+        },
+        {
+          "name": "10 Consultar presentaciones de A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/presentaciones/?producto={{productoAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "presentaciones"
+              ],
+              "query": [
+                {
+                  "key": "producto",
+                  "value": "{{productoAId}}"
+                }
+              ]
+            },
+            "description": "Comprobar que la presentación 60 tiene es_personalizada=false y la 70 tiene true."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 Proveedores y compras",
+      "item": [
+        {
+          "name": "01 Crear proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('proveedorId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/proveedores/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "proveedores"
+              ]
+            },
+            "description": "Depende del login administrador. Guarda proveedorId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Proveedor de pruebas\",\n  \"telefono\": \"\",\n  \"notas\": \"\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Registrar compra con costos A y B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('compraId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/compras/registrar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "compras",
+                "registrar"
+              ]
+            },
+            "description": "Depende de proveedorId y de las presentaciones A/B. Es obligatorio para poder confirmar ventas. No incluye la presentación C para probar costo faltante.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedor_id\": \"{{proveedorId}}\",\n  \"fecha\": \"{{fechaPrueba}}\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 10,\n      \"costo_unitario\": \"50000.00\"\n    },\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaAId}}\",\n      \"cantidad\": 10,\n      \"costo_unitario\": \"50000.00\"\n    },\n    {\n      \"presentacion_id\": \"{{presentacionNormalBId}}\",\n      \"cantidad\": 10,\n      \"costo_unitario\": \"50000.00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 Consultar compras",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/compras/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "compras"
+              ]
+            },
+            "description": "Comprobar que existe la compra y sus costos."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 Pedidos",
+      "item": [
+        {
+          "name": "01 Webhook normal - pago pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoNormalPendienteId', data.id);",
+                  "pm.test('Total normal 150000', function () { pm.expect(data.total).to.eql('150000.00'); });",
+                  "pm.test('Precio guardado', function () { pm.expect(data.detalles[0].precio_unitario).to.eql('150000.00'); });",
+                  "pm.test('No pendiente', function () { pm.expect(data.detalles[0].precio_pendiente).to.eql(false); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionNormalAId y webhookToken. No crear venta todavía. Guarda pedidoNormalPendienteId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000001\",\n  \"nombre_cliente\": \"Clienta pendiente\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Webhook normal - abono",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoNormalAbonoId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionNormalAId. Guarda pedidoNormalAbonoId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000002\",\n  \"nombre_cliente\": \"Clienta abono\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 Webhook normal - pago total",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoNormalPagadoId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionNormalAId. Guarda pedidoNormalPagadoId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000003\",\n  \"nombre_cliente\": \"Clienta pago total\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 Webhook normal - permisos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoPermisosId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionNormalAId. Se usará para probar vendedor 403 y sin token 401.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000004\",\n  \"nombre_cliente\": \"Clienta permisos\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 Webhook normal - rechazo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoRechazoId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionNormalAId. Guarda pedidoRechazoId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000005\",\n  \"nombre_cliente\": \"Clienta rechazo\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 Webhook personalizado - sin precio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoPersonalizadoSinPrecioId', data.id);",
+                  "pm.test('Total personalizado 0', function () { pm.expect(data.total).to.eql('0.00'); });",
+                  "pm.test('Precio pendiente', function () { pm.expect(data.detalles[0].precio_pendiente).to.eql(true); });",
+                  "pm.test('Es personalizada', function () { pm.expect(data.detalles[0].es_personalizada).to.eql(true); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionPersonalizadaAId. Guarda pedidoPersonalizadoSinPrecioId. No se confirma con precio.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000006\",\n  \"nombre_cliente\": \"Clienta personalizada\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 Webhook mixto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoMixtoId', data.id);",
+                  "pm.test('Total provisional 270000', function () { pm.expect(data.total).to.eql('270000.00'); });",
+                  "pm.test('Una línea pendiente', function () { pm.expect(data.detalles.filter(function (d) { return d.precio_pendiente; }).length).to.eql(1); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentaciones A/B. Guarda pedidoMixtoId. Total provisional 270000; línea personalizada pendiente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000007\",\n  \"nombre_cliente\": \"Clienta mixta\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    },\n    {\n      \"presentacion_id\": \"{{presentacionNormalBId}}\",\n      \"cantidad\": 1\n    },\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 Webhook personalizado - sin costo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoPersonalizadoSinCostoId', data.id);",
+                  "pm.test('Precio inicial 0', function () { pm.expect(data.detalles[0].precio_unitario).to.eql('0.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionPersonalizadaCId. No debe existir compra para C. Guarda pedidoPersonalizadoSinCostoId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000008\",\n  \"nombre_cliente\": \"Clienta sin costo\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaCId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 Webhook normal - pagos inválidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoPagosInvalidosId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Depende de presentacionNormalAId. Se usará en casos negativos de pago.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000009\",\n  \"nombre_cliente\": \"Clienta pagos inválidos\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10 Webhook normal - repetición (limitación)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('pedidoWebhookDuplicadoId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "ADVERTENCIA: el webhook no tiene idempotencia. Repetir el mismo cuerpo crea otro Pedido. Esta solicitud documenta el comportamiento actual; no es una prueba superada de deduplicación.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3007000001\",\n  \"nombre_cliente\": \"Clienta pendiente\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11 Consultar pedidos pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/?estado=pendiente",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "pendiente"
+                }
+              ]
+            },
+            "description": "Verificar que los pedidos fallidos o aún no confirmados tienen venta=null y estado pendiente."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 Confirmación",
+      "item": [
+        {
+          "name": "01 Confirmar mixto con precio final",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('ventaMixtoId', data.venta);",
+                  "pm.test('Pedido confirmado', function () { pm.expect(data.estado).to.eql('confirmado'); });",
+                  "pm.test('Total 450000', function () { pm.expect(data.total).to.eql('450000.00'); });",
+                  "pm.test('Pago pendiente', function () { pm.expect(data.estado_pago).to.eql('pendiente'); });",
+                  "pm.test('Saldo completo', function () { pm.expect(data.saldo).to.eql('450000.00'); });",
+                  "pm.test('Sin abonos', function () { pm.expect(data.monto_pagado).to.eql('0.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoMixtoId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoMixtoId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoMixtoId y presentacionPersonalizadaAId. Guarda ventaMixtoId. No se debe modificar el catálogo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\",\n  \"lineas_precio\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaAId}}\",\n      \"precio_venta\": \"180000.00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Confirmar normal - abono parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('ventaNormalAbonoId', data.venta);",
+                  "pm.test('Estado abonado', function () { pm.expect(data.estado_pago).to.eql('abonado'); });",
+                  "pm.test('Saldo 100000', function () { pm.expect(data.saldo).to.eql('100000.00'); });",
+                  "pm.test('Pagado 50000', function () { pm.expect(data.monto_pagado).to.eql('50000.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoNormalAbonoId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoNormalAbonoId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoNormalAbonoId. Debe crear un Abono real de 50000.00 y dejar saldo 100000.00.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"abonado\",\n  \"monto_recibido\": \"50000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "03 Confirmar normal - pago total",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('ventaNormalPagadoId', data.venta);",
+                  "pm.test('Estado pagado', function () { pm.expect(data.estado_pago).to.eql('pagado'); });",
+                  "pm.test('Saldo cero', function () { pm.expect(data.saldo).to.eql('0.00'); });",
+                  "pm.test('Pagado total', function () { pm.expect(data.monto_pagado).to.eql('150000.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoNormalPagadoId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoNormalPagadoId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoNormalPagadoId. Debe crear un Abono por 150000.00 y dejar saldo 0.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pagado\",\n  \"monto_recibido\": \"150000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 Confirmar normal - pago pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('ventaNormalPendienteId', data.venta);",
+                  "pm.test('Estado pendiente', function () { pm.expect(data.estado_pago).to.eql('pendiente'); });",
+                  "pm.test('Saldo total', function () { pm.expect(data.saldo).to.eql('150000.00'); });",
+                  "pm.test('Sin abono', function () { pm.expect(data.monto_pagado).to.eql('0.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoNormalPendienteId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoNormalPendienteId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoNormalPendienteId. No crea Abono. Guarda ventaNormalPendienteId para las pruebas manuales de abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 Personalizado sin precio debe fallar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPersonalizadoSinPrecioId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPersonalizadoSinPrecioId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoPersonalizadoSinPrecioId. Esperado 400. No debe existir Venta ni Abono. El pedido sigue pendiente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 Personalizado sin costo debe fallar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPersonalizadoSinCostoId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPersonalizadoSinCostoId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoPersonalizadoSinCostoId. Esperado 400 por costo faltante. No debe existir Venta ni Abono. El precio 200000 debe quedar guardado en el detalle.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\",\n  \"lineas_precio\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaCId}}\",\n      \"precio_venta\": \"200000.00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 Registrar compra para presentación C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('compraCId', data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/compras/registrar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "compras",
+                "registrar"
+              ]
+            },
+            "description": "Ejecutar solo después del fallo por costo. Depende de proveedorId y presentacionPersonalizadaCId.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedor_id\": \"{{proveedorId}}\",\n  \"fecha\": \"{{fechaPrueba}}\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaCId}}\",\n      \"cantidad\": 1,\n      \"costo_unitario\": \"60000.00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 Reintentar personalizado con costo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.environment.set('ventaPersonalizadaSinCostoId', data.venta);",
+                  "pm.test('Confirmado', function () { pm.expect(data.estado).to.eql('confirmado'); });",
+                  "pm.test('Total 200000', function () { pm.expect(data.total).to.eql('200000.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPersonalizadoSinCostoId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPersonalizadoSinCostoId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de compraCId y del pedido anterior. Debe confirmar sin crear Abono porque estado_pago=pendiente.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\",\n  \"lineas_precio\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaCId}}\",\n      \"precio_venta\": \"200000.00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 Confirmación duplicada debe fallar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoMixtoId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoMixtoId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de la confirmación 01. Esperado 400. No debe crear una segunda Venta ni un segundo Abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\",\n  \"lineas_precio\": [\n    {\n      \"presentacion_id\": \"{{presentacionPersonalizadaAId}}\",\n      \"precio_venta\": \"180000.00\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10 Verificar precio de catálogo A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.test('Precio no modificado', function () { pm.expect(data.precio).to.eql('150000.00'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/productos/{{productoAId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "productos",
+                "{{productoAId}}"
+              ]
+            },
+            "description": "Después de negociar 180000 para la personalización, el precio global de Perfume A debe seguir en 150000.00."
+          },
+          "response": []
+        },
+        {
+          "name": "11 Consultar venta mixta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaMixtoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaMixtoId}}"
+              ]
+            },
+            "description": "Verificar total 450000.00, saldo 450000.00 y abonos vacío porque la confirmación fue con estado pendiente."
+          },
+          "response": []
+        },
+        {
+          "name": "12 Rechazar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoRechazoId}}/rechazar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoRechazoId}}",
+                "rechazar"
+              ]
+            },
+            "description": "Depende de pedidoRechazoId. Esperado 200. No debe crear Venta ni Abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No disponible para prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 Pagos y saldos",
+      "item": [
+        {
+          "name": "01 Registrar abono manual de 50000",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json();",
+                  "pm.test('Saldo 100000', function () { pm.expect(data.saldo).to.eql('100000.00'); });",
+                  "pm.test('Estado abonado', function () { pm.expect(data.estado_pago).to.eql('abonado'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{ventaNormalPendienteId}}-abono-001"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalPendienteId}}/abonos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalPendienteId}}",
+                "abonos"
+              ]
+            },
+            "description": "Depende de ventaNormalPendienteId. Crea un Abono real de 50000.00 y deja saldo 100000.00.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": \"50000.00\",\n  \"fecha\": \"{{fechaPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Consultar venta abonada manual",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalPendienteId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalPendienteId}}"
+              ]
+            },
+            "description": "Verificar saldo 100000.00 y exactamente un Abono de 50000.00."
+          },
+          "response": []
+        },
+        {
+          "name": "03 Repetir abono manual es idempotente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{ventaNormalPendienteId}}-abono-001"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalPendienteId}}/abonos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalPendienteId}}",
+                "abonos"
+              ]
+            },
+            "description": "Repite la misma Idempotency-Key y el mismo pago. Debe devolver el abono existente sin crear otro ni modificar el saldo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": \"50000.00\",\n  \"fecha\": \"{{fechaPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 Abono mayor al saldo debe fallar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{ventaNormalPendienteId}}-abono-002"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalPendienteId}}/abonos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalPendienteId}}",
+                "abonos"
+              ]
+            },
+            "description": "Esperado 400. No debe crear Abono ni modificar el saldo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": \"999999.00\",\n  \"fecha\": \"{{fechaPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 Consultar venta con abono de confirmación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalAbonoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalAbonoId}}"
+              ]
+            },
+            "description": "Verificar saldo 100000.00 y un Abono de 50000.00 creado durante la confirmación."
+          },
+          "response": []
+        },
+        {
+          "name": "06 Consultar venta pagada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalPagadoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalPagadoId}}"
+              ]
+            },
+            "description": "Verificar saldo 0.00 y un Abono por 150000.00."
+          },
+          "response": []
+        },
+        {
+          "name": "07 Consultar clientes con saldo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/reportes/clientes-con-saldo/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "reportes",
+                "clientes-con-saldo"
+              ]
+            },
+            "description": "Verificar que los clientes con ventas pendientes/abonadas aparezcan con la deuda correspondiente."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 Casos negativos",
+      "item": [
+        {
+          "name": "01 Login con credenciales incorrectas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Esperado 401.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02 Perfil sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/usuarios/perfil/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "usuarios",
+                "perfil"
+              ]
+            },
+            "description": "Esperado 401."
+          },
+          "response": []
+        },
+        {
+          "name": "03 Webhook sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Esperado 401. No debe crear Pedido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3009000003\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "04 Webhook con token inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "token-incorrecto"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Esperado 401. No debe crear Pedido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3009000004\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "05 Webhook sin líneas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Esperado 400. No debe crear Pedido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3009000005\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "06 Webhook con cantidad cero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Webhook-Token",
+                "value": "{{webhookToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/webhook/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "webhook"
+              ]
+            },
+            "description": "Esperado 400. No debe crear Pedido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3009000006\",\n  \"lineas\": [\n    {\n      \"presentacion_id\": \"{{presentacionNormalAId}}\",\n      \"cantidad\": 0\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "07 Vendedor no puede crear categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalogo/categorias/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalogo",
+                "categorias"
+              ]
+            },
+            "description": "Esperado 403. No debe crear categoría.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Categoría no autorizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "08 Vendedor no puede crear proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/proveedores/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "proveedores"
+              ]
+            },
+            "description": "Esperado 403. No debe crear proveedor.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Proveedor no autorizado\",\n  \"telefono\": \"\",\n  \"notas\": \"\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "09 Vendedor no puede confirmar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPermisosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPermisosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoPermisosId. Esperado 403. No debe crear Venta ni Abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10 Confirmar sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 401', function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPermisosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPermisosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Esperado 401. No debe crear Venta ni Abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11 Vendedor no puede listar pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos"
+              ]
+            },
+            "description": "Esperado 403. El modelo Pedido no tiene asignaci?n a vendedores; la gesti?n de pedidos es administrativa."
+          },
+          "response": []
+        },
+        {
+          "name": "12 Vendedor no puede ver reportes globales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/reportes/clientes-con-saldo/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "reportes",
+                "clientes-con-saldo"
+              ]
+            },
+            "description": "Esperado 403. La deuda global es informaci?n administrativa."
+          },
+          "response": []
+        },
+        {
+          "name": "13 Vendedor no puede ver compras",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/compras/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "compras"
+              ]
+            },
+            "description": "Esperado 403. Compras es una funci?n administrativa."
+          },
+          "response": []
+        },
+        {
+          "name": "14 Vendedor no puede ver proveedores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/proveedores/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "proveedores"
+              ]
+            },
+            "description": "Esperado 403. Proveedores es una funci?n administrativa."
+          },
+          "response": []
+        },
+        {
+          "name": "15 Vendedor no puede ver venta ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalAbonoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalAbonoId}}"
+              ]
+            },
+            "description": "Depende de la confirmaci?n 02. Esa venta fue registrada por el administrador. Esperado 403."
+          },
+          "response": []
+        },
+        {
+          "name": "16 Vendedor no puede abonar venta ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendedorAccessToken}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{ventaNormalAbonoId}}-abono-001"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/{{ventaNormalAbonoId}}/abonos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas",
+                "{{ventaNormalAbonoId}}",
+                "abonos"
+              ]
+            },
+            "description": "Depende de la confirmaci?n 02. Esperado 403. No debe crear Abono ni modificar el saldo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": \"10000.00\",\n  \"fecha\": \"{{fechaPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "17 Abonado sin monto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPagosInvalidosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPagosInvalidosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Depende de pedidoPagosInvalidosId. No debe crear Venta ni Abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"abonado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "18 Abonado igual al total",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPagosInvalidosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPagosInvalidosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Esperado 400; para pago total usar estado_pago=pagado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"abonado\",\n  \"monto_recibido\": \"150000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "19 Pago total con monto cero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPagosInvalidosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPagosInvalidosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Esperado 400. No debe crear Venta ni Abono.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pagado\",\n  \"monto_recibido\": \"0.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "20 Pago total con monto parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPagosInvalidosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPagosInvalidosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Esperado 400. El monto debe coincidir con el total.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pagado\",\n  \"monto_recibido\": \"50000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "21 Pendiente con monto positivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pedidos/{{pedidoPagosInvalidosId}}/confirmar/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "pedidos",
+                "{{pedidoPagosInvalidosId}}",
+                "confirmar"
+              ]
+            },
+            "description": "Esperado 400. Si no pagó, el monto debe ser cero.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_pago\": \"pendiente\",\n  \"monto_recibido\": \"50000.00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "22 Verificar que no se crearon ventas por los fallos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/finanzas/ventas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "finanzas",
+                "ventas"
+              ]
+            },
+            "description": "Revisar la lista y confirmar que los pedidos de pagos inválidos no tienen Venta. Los pedidos con venta deben ser solo los confirmados exitosamente."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    },
+    {
+      "key": "vendedorAccessToken",
+      "value": ""
+    },
+    {
+      "key": "webhookToken",
+      "value": ""
+    },
+    {
+      "key": "adminUsername",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "vendedorUsername",
+      "value": "vendedor_pruebas"
+    },
+    {
+      "key": "vendedorPassword",
+      "value": ""
+    },
+    {
+      "key": "fechaPrueba",
+      "value": "2026-10-23"
+    },
+    {
+      "key": "runSuffix",
+      "value": "20261023"
+    },
+    {
+      "key": "categoriaId",
+      "value": ""
+    },
+    {
+      "key": "productoAId",
+      "value": ""
+    },
+    {
+      "key": "productoBId",
+      "value": ""
+    },
+    {
+      "key": "productoCId",
+      "value": ""
+    },
+    {
+      "key": "presentacionNormalAId",
+      "value": ""
+    },
+    {
+      "key": "presentacionPersonalizadaAId",
+      "value": ""
+    },
+    {
+      "key": "presentacionNormalBId",
+      "value": ""
+    },
+    {
+      "key": "presentacionPersonalizadaCId",
+      "value": ""
+    },
+    {
+      "key": "proveedorId",
+      "value": ""
+    },
+    {
+      "key": "compraId",
+      "value": ""
+    },
+    {
+      "key": "compraCId",
+      "value": ""
+    },
+    {
+      "key": "pedidoNormalPendienteId",
+      "value": ""
+    },
+    {
+      "key": "pedidoNormalAbonoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoNormalPagadoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoPermisosId",
+      "value": ""
+    },
+    {
+      "key": "pedidoPersonalizadoSinPrecioId",
+      "value": ""
+    },
+    {
+      "key": "pedidoPersonalizadoSinCostoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoMixtoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoPagosInvalidosId",
+      "value": ""
+    },
+    {
+      "key": "pedidoRechazoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoWebhookDuplicadoId",
+      "value": ""
+    },
+    {
+      "key": "ventaNormalPendienteId",
+      "value": ""
+    },
+    {
+      "key": "ventaNormalAbonoId",
+      "value": ""
+    },
+    {
+      "key": "ventaNormalPagadoId",
+      "value": ""
+    },
+    {
+      "key": "ventaMixtoId",
+      "value": ""
+    },
+    {
+      "key": "ventaPersonalizadaSinCostoId",
+      "value": ""
+    },
+    {
+      "key": "vendedorId",
+      "value": ""
+    }
+  ]
+}

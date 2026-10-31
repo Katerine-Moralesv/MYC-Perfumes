@@ -1,0 +1,239 @@
+.ventas-page,
+.ventas-page * { box-sizing: border-box; }
+.ventas-page { width: 100%; min-width: 0; color: #433b3e; }
+.ventas-page-heading { display: flex; align-items: center; gap: 16px; margin: 0 0 20px; }
+.ventas-heading-icon { display: grid; place-items: center; flex: 0 0 52px; width: 52px; height: 52px; color: #c97880; background: #fbe9e7; border: 1px solid #f1d4d0; border-radius: 15px; }
+.ventas-eyebrow { margin: 0 0 5px; color: #bf7a80; font-size: 10px; font-weight: 800; letter-spacing: .19em; text-transform: uppercase; }
+.ventas-page-heading h1 { margin: 0; color: #3d3235; font: 500 clamp(28px, 3vw, 38px)/1.1 Georgia, "Times New Roman", serif; }
+.ventas-page-heading p:not(.ventas-eyebrow) { margin: 8px 0 0; color: #80757a; font-size: 14px; line-height: 1.5; }
+.ventas-demo-notice { display: flex; align-items: center; gap: 9px; margin: 0 0 21px; padding: 11px 14px; border: 1px solid #e5d9c7; border-radius: 10px; background: #faf4e8; color: #786c54; font-size: 12px; line-height: 1.45; }
+.ventas-real-notice { display: flex; align-items: center; gap: 9px; margin: 0 0 21px; padding: 11px 14px; border: 1px solid #dce8d7; border-radius: 10px; background: #f4f8f1; color: #657b5e; font-size: 12px; line-height: 1.45; }
+.ventas-tabs { display: flex; align-items: center; gap: 5px; margin: 0 0 23px; padding: 0 0 0; border-bottom: 1px solid #efdfdb; }
+.ventas-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 45px; padding: 11px 19px; border: 1px solid transparent; border-radius: 10px 10px 0 0; background: transparent; color: #81737a; font: inherit; font-size: 13px; cursor: pointer; transition: background .18s, color .18s, border-color .18s; }
+.ventas-tabs button:hover { color: #b86f77; background: #fff4f2; }
+.ventas-tabs button.seleccionada { color: #bd747c; border-color: #f0d7d3; border-bottom-color: #fffbf8; background: #fbedeb; font-weight: 700; }
+.ventas-tab-count { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 20px; background: #d98b91; color: white; font-size: 11px; }
+.ventas-panel { width: 100%; min-width: 0; padding: 25px; border: 1px solid #f0dbd5; border-radius: 17px; background: rgba(255, 252, 249, .94); box-shadow: 0 7px 22px rgba(113, 73, 68, .035); }
+.ventas-section-title { display: flex; align-items: flex-start; gap: 13px; margin: 0 0 22px; }
+.ventas-small-icon { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 50%; color: #bb7a80; background: #f9e7e5; }
+.ventas-whatsapp-icon { color: #9c8064; background: #f4ecdf; }
+.ventas-section-title h2 { margin: 0; color: #42373b; font-size: 18px; font-weight: 700; }
+.ventas-section-title p { margin: 5px 0 0; color: #8a7d82; font-size: 13px; line-height: 1.5; }
+.ventas-form { display: flex; flex-direction: column; gap: 19px; }
+.ventas-form-section { margin-bottom: 4px; }
+.ventas-form-state { display: flex; align-items: center; gap: 10px; padding: 16px; border: 1px dashed #e7d9d3; border-radius: 11px; background: #fffdf9; color: #94858a; font-size: 12px; }
+.ventas-form-state p { margin: 0; }
+.ventas-form-state-error { align-items: flex-start; justify-content: space-between; flex-wrap: wrap; border-style: solid; border-color: #efceca; background: #fff6f4; color: #a95f65; }
+.ventas-form-notice { padding: 13px 15px; border: 1px solid #ead9b8; border-radius: 10px; background: #fff9ed; color: #96743d; font-size: 12px; line-height: 1.55; }
+.ventas-form-help { margin: -4px 0 0; color: #988b90; font-size: 11px; line-height: 1.55; }
+.ventas-fields-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px 18px; }
+.ventas-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; color: #62565c; font-size: 12px; font-weight: 700; }
+.ventas-field-wide { grid-column: 1 / -1; }
+.ventas-field-porcentaje { grid-column: span 1; }
+.ventas-porcentaje-ayuda { color: #a09499; font-size: 10px; font-weight: 400; line-height: 1.3; }
+.ventas-porcentaje-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: -1px; }
+.ventas-porcentaje-tags span { padding: 3px 7px; border: 1px solid #eed8d3; border-radius: 999px; background: #fbece9; color: #a56f76; font-size: 9px; font-weight: 600; line-height: 1.2; }
+.ventas-porcentaje-error { margin: 0; color: #b44953; font-size: 10px; font-weight: 400; line-height: 1.45; }
+.ventas-field input, .ventas-field select, .ventas-payment-confirm select, .ventas-filter select { width: 100%; min-width: 0; min-height: 43px; padding: 10px 12px; border: 1px solid #ead9d4; border-radius: 9px; outline: none; background: #fffaf7; color: #494047; font: inherit; font-size: 13px; font-weight: 400; }
+.ventas-field input:focus, .ventas-field select:focus, .ventas-search:focus-within, .ventas-inline-field:focus-within, .ventas-date-field:focus { border-color: #cf9698; box-shadow: 0 0 0 3px rgba(207, 150, 152, .13); }
+.ventas-field small { color: #a09499; font-size: 11px; font-weight: 400; line-height: 1.45; }
+.ventas-payment { margin: 0; padding: 0; border: 0; }
+.ventas-payment legend { margin-bottom: 9px; color: #63575d; font-size: 12px; font-weight: 700; }
+.ventas-payment-options { display: flex; flex-wrap: wrap; gap: 9px; }
+.ventas-payment-options button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 9px 14px; border: 1px solid #e8d9d4; border-radius: 9px; background: #fffaf7; color: #82757b; font: inherit; font-size: 12px; cursor: pointer; }
+.ventas-payment-options button.activo { border-color: #c9d3be; background: #edf1e7; color: #5e7655; font-weight: 700; }
+.ventas-total { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 17px 18px; border: 1px solid #e4ddcf; border-radius: 11px; background: #f8f5ed; color: #746b61; font-size: 13px; }
+.ventas-total strong { color: #3c4939; font-size: 22px; font-weight: 700; }
+.ventas-save, .ventas-confirm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 11px 18px; border: 1px solid #74866c; border-radius: 10px; background: #74866c; color: white; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .18s, transform .18s; }
+.ventas-save { align-self: flex-start; }
+.ventas-save:hover:not(:disabled), .ventas-confirm-btn:hover:not(:disabled) { background: #63785c; transform: translateY(-1px); }
+.ventas-save:disabled, .ventas-confirm-btn:disabled { cursor: not-allowed; opacity: .6; }
+.ventas-payment-options button:disabled { cursor: not-allowed; opacity: .6; }
+.ventas-field input:disabled, .ventas-field select:disabled { cursor: not-allowed; opacity: .7; }
+.ventas-recent { margin-top: 31px; padding-top: 25px; border-top: 1px solid #f0e4df; }
+.ventas-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 126px; padding: 20px; border: 1px dashed #e7d9d3; border-radius: 12px; color: #b99496; text-align: center; }
+.ventas-empty p { margin: 0; color: #93858b; font-size: 13px; }
+.ventas-empty-error { border-style: solid; border-color: #efceca; background: #fff8f6; }
+.ventas-empty-error p { color: #a95f65; }
+.ventas-reintentar { min-height: 34px; padding: 7px 12px; border: 1px solid #e2cec7; border-radius: 8px; background: #fffaf7; color: #a16b70; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+.ventas-reintentar:hover { background: #fbece8; }
+.ventas-table-wrap { width: 100%; overflow-x: auto; border: 1px solid #eeddd7; border-radius: 12px; background: #fffdfa; }
+.ventas-table { width: 100%; min-width: 880px; border-collapse: collapse; text-align: left; font-size: 12px; }
+.ventas-table thead { background: #fbedeb; }
+.ventas-table th { padding: 13px 14px; color: #61535a; font-weight: 700; white-space: nowrap; }
+.ventas-table td { padding: 13px 14px; border-top: 1px solid #f2e6e0; color: #645960; vertical-align: middle; }
+.ventas-table tbody tr:hover { background: #fffbf7; }
+.ventas-table td strong { color: #4a3d43; }
+.ventas-origin { display: block; margin-top: 4px; color: #a09197; font-size: 10px; }
+.ventas-status { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 25px; background: #f8eae7; color: #bc747c; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.ventas-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.ventas-status.status-pagado, .ventas-status.status-confirmado { background: #e8f0e4; color: #5d8054; }
+.ventas-status.status-abonado { background: #f8efdd; color: #a87e43; }
+.ventas-status.status-rechazado { background: #fae6e5; color: #bb5f68; }
+.ventas-status.status-pendiente { background: #f8eae7; color: #bc747c; }
+.ventas-status.status-completo { background: #e8f0e4; color: #5d8054; }
+.ventas-status.status-parcial { background: #f8efdd; color: #a87e43; }
+.ventas-message { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin: 0 0 17px; padding: 12px 14px; border: 1px solid #d7e4d0; border-radius: 10px; background: #eff5ea; color: #55714e; font-size: 12px; line-height: 1.5; }
+.ventas-message.error { border-color: #efceca; background: #fff1ef; color: #ac575e; }
+.ventas-message button { flex: 0 0 auto; border: 0; background: transparent; color: inherit; font-size: 21px; cursor: pointer; }
+.ventas-order-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin: 0 0 23px; }
+.ventas-order-stats > div { display: flex; min-width: 0; flex-direction: column; gap: 7px; padding: 15px 16px; border: 1px solid #efdfda; border-radius: 11px; background: #fffaf7; }
+.ventas-order-stats span { color: #897b81; font-size: 11px; }
+.ventas-order-stats strong { color: #4d4147; font: 500 25px/1 Georgia, serif; }
+.ventas-orders-tools { display: flex; align-items: end; gap: 12px; margin-bottom: 18px; }
+.ventas-search { display: flex; align-items: center; gap: 9px; flex: 1; min-width: 180px; min-height: 42px; padding: 0 12px; border: 1px solid #ead9d4; border-radius: 9px; background: #fffaf7; color: #9a858a; }
+.ventas-search input { width: 100%; min-width: 0; padding: 10px 0; border: 0; outline: 0; background: transparent; color: #4c4247; font: inherit; font-size: 12px; }
+.ventas-filter { display: flex; align-items: center; gap: 9px; color: #7f7077; font-size: 12px; }
+.ventas-filter select { min-width: 145px; min-height: 42px; }
+.ventas-orders-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 3px 0 12px; color: #5d5056; font-size: 13px; font-weight: 700; }
+.ventas-pending-count { padding: 7px 11px; border-radius: 22px; background: #f8eae7; color: #bd737a; font-size: 11px; font-weight: 600; }
+.ventas-order-customer { display: flex; flex-direction: column; gap: 4px; min-width: 155px; }
+.ventas-order-customer > span { color: #6b5d64; }
+.ventas-order-customer small, .ventas-order-items small { color: #9b8c92; font-size: 10px; line-height: 1.45; }
+.ventas-order-items { display: flex; flex-direction: column; gap: 8px; min-width: 160px; }
+.ventas-order-items > span { display: flex; flex-direction: column; gap: 3px; }
+.ventas-total-provisional { display: block; margin-top: 5px; color: #a48a60; font-size: 10px; }
+.ventas-rejection-note { display: block; max-width: 160px; margin-top: 5px; color: #b46d73; font-size: 10px; line-height: 1.4; white-space: normal; }
+.ventas-order-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-width: 150px; }
+.ventas-detail-btn, .ventas-reject, .ventas-approve { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 8px 10px; border: 1px solid #e6d8d2; border-radius: 8px; background: #fffaf7; color: #7a666e; font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
+.ventas-detail-btn:hover { background: #f7eee7; }
+.ventas-reject { border-color: #f1d0d0; background: #fff1f0; color: #bc666c; }
+.ventas-reject:hover { background: #fbe0df; }
+.ventas-demo-footnote { margin: 15px 0 0; color: #9a8d92; font-size: 11px; line-height: 1.5; }
+.ventas-modal-backdrop { position: fixed; z-index: 2000; inset: 0; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 22px; background: rgba(54, 43, 49, .4); backdrop-filter: blur(4px); }
+.ventas-modal { width: min(1080px, 100%); max-height: calc(100vh - 44px); overflow-y: auto; padding: 25px; border: 1px solid #eed9d3; border-radius: 18px; background: #fffaf6; box-shadow: 0 25px 70px rgba(56, 42, 46, .23); }
+.ventas-modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 0 0 21px; }
+.ventas-modal-header h2 { margin: 0; color: #42383c; font: 500 clamp(23px, 2.7vw, 30px)/1.15 Georgia, serif; }
+.ventas-modal-header p:not(.ventas-eyebrow) { margin: 7px 0 0; color: #8d7f84; font-size: 12px; line-height: 1.5; }
+.ventas-modal-close { display: grid; place-items: center; flex: 0 0 35px; width: 35px; height: 35px; border: 1px solid #e9dcd6; border-radius: 50%; background: #fff5f1; color: #876c72; font-size: 22px; cursor: pointer; }
+.ventas-client-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 20px; padding: 15px; border: 1px solid #efdfda; border-radius: 12px; background: #fffdf9; }
+.ventas-client-summary > div { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.ventas-client-summary small { color: #a48788; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.ventas-client-summary strong { color: #504247; font-size: 13px; }
+.ventas-client-summary span:not(.ventas-status) { color: #8e8186; font-size: 11px; }
+.ventas-detail-table-wrap { width: 100%; overflow-x: auto; border: 1px solid #efdfda; border-radius: 11px; }
+.ventas-detail-table { width: 100%; min-width: 790px; border-collapse: collapse; text-align: left; font-size: 12px; }
+.ventas-detail-table thead { background: #fbedeb; }
+.ventas-detail-table th { padding: 12px 11px; color: #65565c; font-size: 11px; white-space: nowrap; }
+.ventas-detail-table td { padding: 13px 11px; border-top: 1px solid #f2e5df; vertical-align: top; color: #6b5b62; }
+.ventas-detail-table td:first-child { min-width: 190px; }
+.ventas-detail-table td strong, .ventas-detail-table td small { display: block; }
+.ventas-detail-table td strong { color: #4c3f45; }
+.ventas-detail-table td small { margin-top: 4px; color: #9b8b91; font-size: 10px; }
+.ventas-concentration-pill { display: inline-flex; padding: 5px 8px; border-radius: 20px; background: #f5ece0; color: #9b7b54; font-weight: 700; }
+.ventas-inline-field { display: flex; align-items: center; gap: 4px; min-width: 118px; padding: 0 8px; border: 1px solid #e7d7d1; border-radius: 7px; background: #fffdf9; color: #9a8a8e; }
+.ventas-inline-field input { width: 100%; min-width: 0; padding: 8px 0; border: 0; outline: 0; background: transparent; color: #4e4247; font: inherit; font-size: 12px; }
+.ventas-date-field { width: 142px; min-height: 34px; padding: 7px; border: 1px solid #e7d7d1; border-radius: 7px; outline: 0; background: #fffdf9; color: #64555b; font: inherit; font-size: 11px; }
+.ventas-field-hint { display: block; margin-top: 5px; color: #b28653 !important; }
+.ventas-agreement-tip { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; padding: 12px 13px; border: 1px solid #e6dcc4; border-radius: 10px; background: #fbf6e9; color: #8a774e; }
+.ventas-agreement-tip svg { flex-shrink: 0; margin-top: 1px; }
+.ventas-agreement-tip p { margin: 0; font-size: 11px; line-height: 1.55; }
+.ventas-detail-total { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 16px; padding: 15px 17px; border: 1px solid #e3ddcf; border-radius: 11px; background: #f8f5ed; }
+.ventas-detail-total > div { display: flex; flex-direction: column; gap: 5px; }
+.ventas-detail-total > div span { color: #82776c; font-size: 11px; }
+.ventas-detail-total strong { color: #424d3d; font-size: 23px; }
+.ventas-complete-tag, .ventas-incomplete-tag { padding: 7px 10px; border-radius: 20px; background: #e7f0e2; color: #5e8057; font-size: 10px; font-weight: 700; }
+.ventas-incomplete-tag { background: #f9eadf; color: #ac7d54; }
+.ventas-payment-confirm { display: grid; grid-template-columns: minmax(180px, 250px) 1fr; align-items: end; gap: 13px; margin-top: 17px; }
+.ventas-payment-confirm label { display: flex; flex-direction: column; gap: 7px; color: #68585e; font-size: 12px; font-weight: 700; }
+.ventas-payment-confirm select:disabled { background: #f2eeea; color: #aaa0a3; cursor: not-allowed; }
+.ventas-payment-confirm > small { padding-bottom: 11px; color: #998b91; font-size: 10px; line-height: 1.5; }
+.ventas-processed-note { margin-top: 16px; padding: 12px 13px; border-radius: 9px; background: #f4efe7; color: #786b5d; font-size: 12px; }
+.ventas-detail-feedback { margin: 13px 0 0; color: #65805d; font-size: 11px; line-height: 1.5; }
+.ventas-detail-feedback.error { color: #b65b63; }
+.ventas-modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 21px; padding-top: 17px; border-top: 1px solid #efe3dd; }
+.ventas-secondary-btn { min-height: 41px; padding: 10px 15px; border: 1px solid #e3d7d1; border-radius: 9px; background: #fffdf9; color: #796b71; font: inherit; font-size: 12px; cursor: pointer; }
+.ventas-secondary-btn:hover { background: #f8f0eb; }
+.ventas-confirm-btn:disabled { border-color: #d6d3cb; background: #d6d3cb; cursor: not-allowed; transform: none; }
+.ventas-reject-backdrop { z-index: 2010; }
+.ventas-reject-modal { width: min(500px, 100%); padding: 24px; border: 1px solid #eed9d3; border-radius: 17px; background: #fffaf6; box-shadow: 0 25px 70px rgba(56, 42, 46, .23); }
+.ventas-reject-form { display: flex; flex-direction: column; gap: 9px; }
+.ventas-reject-form label { color: #63545a; font-size: 12px; font-weight: 700; }
+.ventas-reject-form textarea { width: 100%; resize: vertical; padding: 12px; border: 1px solid #e6d6d0; border-radius: 9px; outline: 0; background: #fffdf9; color: #4d4247; font: inherit; font-size: 12px; line-height: 1.5; }
+.ventas-reject-form textarea:focus { border-color: #cb8e94; box-shadow: 0 0 0 3px rgba(203, 142, 148, .12); }
+.ventas-reject-confirm { min-height: 41px; padding: 10px 15px; border: 1px solid #c8767d; border-radius: 9px; background: #c8767d; color: white; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.ventas-reject-confirm:disabled { opacity: .5; cursor: not-allowed; }
+
+@media (max-width: 900px) {
+  .ventas-order-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ventas-panel { padding: 20px; }
+  .ventas-client-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .ventas-page-heading { align-items: flex-start; gap: 12px; }
+  .ventas-heading-icon { flex-basis: 43px; width: 43px; height: 43px; }
+  .ventas-page-heading h1 { font-size: 28px; }
+  .ventas-page-heading p:not(.ventas-eyebrow) { font-size: 12px; }
+  .ventas-tabs { gap: 2px; }
+  .ventas-tabs button { flex: 1; min-width: 0; gap: 6px; padding: 10px 7px; font-size: 11px; }
+  .ventas-panel { padding: 15px 12px; border-radius: 13px; }
+  .ventas-fields-grid { grid-template-columns: 1fr; gap: 13px; }
+  .ventas-field-wide { grid-column: auto; }
+  .ventas-order-stats { gap: 8px; }
+  .ventas-order-stats > div { padding: 12px; }
+  .ventas-order-stats strong { font-size: 22px; }
+  .ventas-orders-tools { align-items: stretch; flex-direction: column; }
+  .ventas-search { min-height: 42px; }
+  .ventas-filter { display: grid; grid-template-columns: 55px 1fr; }
+  .ventas-filter select { min-width: 0; }
+  .ventas-client-summary { grid-template-columns: 1fr; }
+  .ventas-detail-total { align-items: flex-start; flex-direction: column; }
+  .ventas-payment-confirm { grid-template-columns: 1fr; }
+  .ventas-payment-confirm > small { padding: 0; }
+  .ventas-modal-backdrop { align-items: flex-start; padding: 10px; }
+  .ventas-modal { max-height: calc(100vh - 20px); padding: 17px 12px; border-radius: 13px; }
+  .ventas-reject-modal { padding: 18px 13px; }
+  .ventas-modal-actions { flex-direction: column-reverse; }
+  .ventas-modal-actions button { width: 100%; }
+  .ventas-demo-notice, .ventas-real-notice { align-items: flex-start; font-size: 11px; }
+  .ventas-form-state-error { align-items: stretch; }
+  .ventas-form-state-error .ventas-reintentar { align-self: flex-start; }
+}
+
+/* Campos de abono: permiten registrar el importe realmente recibido. */
+.ventas-abono-field {
+  max-width: 520px;
+  padding: 14px;
+  border: 1px solid #eadfd2;
+  border-radius: 10px;
+  background: #fbf7ef;
+}
+.ventas-payment-confirm-abono {
+  grid-column: 1 / -1;
+  max-width: 520px;
+  padding: 12px;
+  border: 1px solid #eadfd2;
+  border-radius: 10px;
+  background: #fbf7ef;
+}
+.ventas-payment-confirm-abono input {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid #ead9d4;
+  border-radius: 8px;
+  outline: none;
+  background: #fffaf7;
+  color: #494047;
+  font: inherit;
+  font-size: 13px;
+}
+.ventas-payment-confirm-abono input:focus {
+  border-color: #cf9698;
+  box-shadow: 0 0 0 3px rgba(207, 150, 152, .13);
+}
+.ventas-payment-confirm-abono small {
+  padding: 0;
+  color: #998b91;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* Fecha de acuerdo automática (solo lectura) y campos de importe editables. */
+.ventas-auto-date { display: inline-flex; align-items: center; min-height: 32px; max-width: 190px; padding: 7px 9px; border: 1px solid #e7d7d1; border-radius: 8px; background: #faf4ef; color: #84767a; font-size: 11px; line-height: 1.35; }
+.ventas-auto-date.registrada { border-color: #ddcfc4; background: #f6eee7; color: #76625e; white-space: nowrap; }
+.ventas-auto-date.pendiente { border-style: dashed; background: #fffaf5; color: #a38c86; }
+.ventas-inline-field input:focus { outline: 0; }
+.ventas-inline-field:focus-within { border-color: #c98f94; box-shadow: 0 0 0 3px rgba(201,143,148,.12); }
+.ventas-payment-confirm-abono input { width: 100%; min-height: 40px; padding: 10px 12px; border: 1px solid #e4d4ce; border-radius: 9px; background: #fffdfa; color: #4d4247; font: inherit; }
+.ventas-payment-confirm-abono input:focus { outline: none; border-color: #c98f94; box-shadow: 0 0 0 3px rgba(201,143,148,.12); }

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Perfumes MYC: fragancias para expresar tu identidad y acompañar tus momentos."
+    />
+    <meta name="theme-color" content="#fff9f3" />
+    <title>Perfumes MYC | Tu aroma, tu esencia</title>
+    <style>
+      .myc-boot {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        min-height: 100vh;
+        padding: 24px;
+        background: #fff9f3;
+        color: #383438;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+      }
+
+      .myc-boot strong {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 26px;
+        font-weight: 400;
+      }
+
+      .myc-boot p {
+        max-width: 460px;
+        margin: 0;
+        color: #6b6263;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .myc-boot-spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid #d8dcc9;
+        border-top-color: #66715a;
+        border-radius: 50%;
+        animation: myc-boot-girar 0.8s linear infinite;
+      }
+
+      .myc-boot button {
+        min-height: 42px;
+        padding: 10px 18px;
+        border: 1px solid #66715a;
+        border-radius: 9px;
+        background: #66715a;
+        color: #fff9f3;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .myc-boot-error .myc-boot-spinner {
+        display: none;
+      }
+
+      .myc-boot-error #myc-boot-reintentar {
+        display: inline-flex;
+      }
+
+      #myc-boot-reintentar {
+        display: none;
+      }
+
+      @keyframes myc-boot-girar {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="myc-boot" id="myc-boot" role="status" aria-live="polite">
+        <span class="myc-boot-spinner" aria-hidden="true"></span>
+        <strong>Perfumes MYC</strong>
+        <p id="myc-boot-aviso">Preparando tu esencia...</p>
+        <p id="myc-boot-detalle"></p>
+        <button type="button" id="myc-boot-reintentar">Reintentar</button>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var root = document.getElementById("root");
+        var aviso = document.getElementById("myc-boot-aviso");
+        var detalle = document.getElementById("myc-boot-detalle");
+        var reintentar = document.getElementById("myc-boot-reintentar");
+        var temporizador = null;
+        var montado = false;
+        var CLAVE_REINTENTO = "myc_boot_retry";
+
+        function limpiarReintento() {
+          try {
+            sessionStorage.removeItem(CLAVE_REINTENTO);
+          } catch (error) {
+            void error;
+          }
+        }
+
+        function marcarMontado() {
+          montado = true;
+          window.__mycReactMounted = true;
+
+          if (temporizador !== null) {
+            window.clearTimeout(temporizador);
+            temporizador = null;
+          }
+
+          limpiarReintento();
+        }
+
+        function mostrarError(mensaje) {
+          if (montado) return;
+
+          document.body.classList.add("myc-boot-error");
+
+          if (aviso) {
+            aviso.textContent = "No pudimos mostrar la página.";
+          }
+
+          if (detalle) {
+            detalle.textContent =
+              mensaje ||
+              "Revisa tu conexión y vuelve a intentarlo. Tus datos no se han modificado.";
+          }
+        }
+
+        function yaSeReintento() {
+          try {
+            return sessionStorage.getItem(CLAVE_REINTENTO) === "1";
+          } catch (error) {
+            void error;
+            return false;
+          }
+        }
+
+        function marcarReintento() {
+          try {
+            sessionStorage.setItem(CLAVE_REINTENTO, "1");
+          } catch (error) {
+            void error;
+          }
+        }
+
+        function recargarConCacheNueva() {
+          var url =
+            window.location.pathname +
+            "?recargar=" +
+            Date.now() +
+            window.location.hash;
+
+          window.location.replace(url);
+        }
+
+        function reintentarCarga(automatico) {
+          if (automatico) {
+            if (yaSeReintento()) {
+              mostrarError(
+                "La aplicación no terminó de cargar. Pulsa Reintentar para volver a probar."
+              );
+              return;
+            }
+
+            marcarReintento();
+            recargarConCacheNueva();
+            return;
+          }
+
+          window.location.reload();
+        }
+
+        window.addEventListener("myc:ready", marcarMontado);
+
+        window.addEventListener(
+          "error",
+          function (evento) {
+            if (montado) return;
+
+            if (evento && evento.target && evento.target.tagName === "SCRIPT") {
+              mostrarError(
+                "No se pudo cargar un archivo necesario de la aplicación."
+              );
+            }
+          },
+          true
+        );
+
+        window.addEventListener("unhandledrejection", function () {
+          if (!montado) {
+            mostrarError("Ocurrió un error inesperado al iniciar la aplicación.");
+          }
+        });
+
+        if (reintentar) {
+          reintentar.addEventListener("click", function () {
+            reintentarCarga(false);
+          });
+        }
+
+        temporizador = window.setTimeout(function () {
+          if (montado) return;
+          if (!root || !root.querySelector(".myc-boot")) return;
+
+          reintentarCarga(true);
+        }, 12000);
+      })();
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
