@@ -3,13 +3,23 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
-
 from rest_framework_simplejwt.views import TokenRefreshView
-
 from apps.usuarios.views import LoginView
+from django.http import JsonResponse
+
+
+def api_inicio(request):
+    return JsonResponse({
+        "mensaje": "API de Perfumes MYC funcionando correctamente",
+        "estado": "activo",
+        "version": "1.0",
+    })
 
 
 urlpatterns = [
+
+    path("", api_inicio, name="api_inicio"),
+
     # ========================================================
     # ADMINISTRACIÓN DJANGO
     # ========================================================
