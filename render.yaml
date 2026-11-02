@@ -69,27 +69,6 @@ services:
       - key: SUPABASE_STORAGE_QUERYSTRING_AUTH
         value: "False"
 
-      - key: WHATSAPP_ENABLED
-        value: "False"
-      - key: WHATSAPP_ASYNC_ENABLED
-        value: "True"
-      - key: WHATSAPP_API_VERSION
-        value: v23.0
-      - key: WHATSAPP_VERIFY_TOKEN
-        sync: false
-      - key: WHATSAPP_APP_SECRET
-        sync: false
-      - key: WHATSAPP_ACCESS_TOKEN
-        sync: false
-      - key: WHATSAPP_PHONE_NUMBER_ID
-        sync: false
-      - key: WHATSAPP_ADMIN_PHONE
-        sync: false
-      - key: WHATSAPP_TEMPLATE_NAME
-        sync: false
-      - key: WHATSAPP_TEMPLATE_LANGUAGE
-        value: es
-
       - key: EMAIL_BACKEND
         value: django.core.mail.backends.smtp.EmailBackend
       - key: EMAIL_HOST

@@ -5,7 +5,7 @@ def normalizar_telefono(valor: str) -> str:
     """
     Deja solo dígitos y antepone +57 si parece un celular colombiano
     de 10 dígitos sin indicativo. Útil porque tanto 'finanzas' (Cliente)
-    como 'pedidos' (webhook de WhatsApp) reciben teléfonos en formatos
+    como 'pedidos' (tienda y webhook) reciben teléfonos en formatos
     distintos y necesitan compararlos de forma consistente.
     """
     if not valor:

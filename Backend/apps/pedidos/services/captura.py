@@ -1,9 +1,6 @@
-import logging
-import threading
 from decimal import Decimal
 
-from django.conf import settings
-from django.db import close_old_connections, transaction
+from django.db import transaction
 
 from apps.core.exceptions import ReglaNegocioError
 from apps.core.utils import normalizar_telefono
@@ -17,50 +14,8 @@ from apps.pedidos.repositories import (
 )
 
 
-logger = logging.getLogger(__name__)
-
 MAX_CANTIDAD_POR_LINEA = 100
 PORCENTAJES_RECARGA = {60, 70, 80}
-
-
-def _enviar_notificacion(pedido_id, *, cerrar_conexiones):
-    try:
-        if cerrar_conexiones:
-            close_old_connections()
-
-        from apps.pedidos.services.notificaciones import (
-            notificar_pedido_creado,
-        )
-
-        notificar_pedido_creado(pedido_id)
-    except Exception:
-        logger.exception(
-            "Error inesperado al notificar por WhatsApp el pedido %s.",
-            pedido_id,
-        )
-    finally:
-        if cerrar_conexiones:
-            close_old_connections()
-
-
-def _notificar_pedido_creado(pedido_id):
-    if not getattr(settings, "WHATSAPP_ASYNC_ENABLED", False):
-        _enviar_notificacion(
-            pedido_id,
-            cerrar_conexiones=False,
-        )
-        return
-
-    hilo = threading.Thread(
-        target=_enviar_notificacion,
-        kwargs={
-            "pedido_id": pedido_id,
-            "cerrar_conexiones": True,
-        },
-        daemon=True,
-        name=f"whatsapp-pedido-{pedido_id}",
-    )
-    hilo.start()
 
 
 def _resolver_recarga(linea):
@@ -167,7 +122,7 @@ def registrar_pedido(
     hash_solicitud="",
 ):
     """
-    Registra un pedido proveniente del bot de WhatsApp o de la tienda web.
+    Registra un pedido proveniente de la tienda web o de integraciones externas.
 
     Este servicio NO crea ventas ni modifica dinero.
     El pedido queda pendiente hasta que un usuario autenticado
@@ -279,9 +234,5 @@ def registrar_pedido(
 
     pedido.total = total
     pedido.save(update_fields=["total"])
-
-    transaction.on_commit(
-        lambda: _notificar_pedido_creado(pedido.id)
-    )
 
     return pedido

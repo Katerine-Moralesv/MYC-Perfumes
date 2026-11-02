@@ -175,12 +175,6 @@ Variables principales:
 | `SUPABASE_S3_SECRET_ACCESS_KEY` | Clave S3 secreta | Supabase Storage > S3 access keys |
 | `SUPABASE_STORAGE_PUBLIC_URL` | URL pública del bucket | Supabase, o se deduce automáticamente |
 | `SUPABASE_STORAGE_QUERYSTRING_AUTH` | `False` | Bucket público |
-| `WHATSAPP_ENABLED` | `False` hasta configurar Meta | Meta |
-| `WHATSAPP_VERIFY_TOKEN` | Token inventado por ti | Meta webhook |
-| `WHATSAPP_APP_SECRET` | App Secret de Meta | Meta > App settings |
-| `WHATSAPP_ACCESS_TOKEN` | Token de Meta | Meta > WhatsApp > API Setup |
-| `WHATSAPP_PHONE_NUMBER_ID` | ID numérico del número | Meta > WhatsApp > API Setup |
-| `WHATSAPP_ADMIN_PHONE` | Número administrador | Tu número, con indicativo y sin `+` |
 | `WEBHOOK_TOKEN` | Token interno | Cadena aleatoria |
 | `EMAIL_*` | Credenciales SMTP | Proveedor de correo |
 
@@ -259,15 +253,10 @@ compatible disponible y verifica que Django 6.1.1 y `psycopg` funcionen.
    python manage.py showmigrations --plan
    ```
 
-4. **No apliques migraciones todavía.** En la base local la única
-   migración pendiente es:
-
-   ```text
-   [ ] whatsapp.0001_notificacion_whatsapp
-   ```
-
-   En una base nueva de Supabase aparecerán todas las migraciones
-   pendientes. Aplicarlas requiere tu autorización expresa.
+4. **No apliques migraciones todavía.** Revisa el plan y confirma qué
+   migraciones están pendientes. En una base nueva de Supabase aparecerán
+   todas las migraciones pendientes. Aplicarlas requiere tu autorización
+   expresa.
 
 5. Cuando autorices las migraciones, ejecuta en Render Shell:
 
@@ -462,9 +451,6 @@ Con autorización para aplicar migraciones:
 python manage.py migrate
 ```
 
-Si decides no aplicar `whatsapp.0001_notificacion_whatsapp`, no ejecutes
-`migrate` completo. Esa decisión debe tomarse antes de continuar.
-
 ### 13.3 Copiar datos
 
 Opción PostgreSQL → PostgreSQL:
@@ -535,56 +521,7 @@ la carpeta completa.
 
 ---
 
-## 14. Configurar el webhook de WhatsApp
-
-La integración permanece desactivada con `WHATSAPP_ENABLED=False` hasta
-que configures Meta.
-
-### 14.1 Variables necesarias
-
-```env
-WHATSAPP_ENABLED=False
-WHATSAPP_VERIFY_TOKEN=<cadena-inventada-por-ti>
-WHATSAPP_APP_SECRET=<app-secret-de-meta>
-WHATSAPP_ACCESS_TOKEN=<token-de-meta>
-WHATSAPP_PHONE_NUMBER_ID=<id-numerico-del-numero>
-WHATSAPP_ADMIN_PHONE=<tu-numero-sin-signo-mas>
-WHATSAPP_API_VERSION=v23.0
-WHATSAPP_TIMEOUT_SECONDS=10
-WHATSAPP_TEMPLATE_NAME=
-WHATSAPP_TEMPLATE_LANGUAGE=es
-```
-
-### 14.2 Configurar el callback en Meta
-
-En **Meta for Developers > Tu app > WhatsApp > Configuration**:
-
-- **Callback URL:**
-  ```text
-  https://<backend>.onrender.com/api/v1/whatsapp/webhook/
-  ```
-- **Verify token:** el mismo valor de `WHATSAPP_VERIFY_TOKEN`.
-- Suscríbete al campo `messages`.
-
-Meta hará una petición `GET` de verificación. El endpoint responde con el
-`hub.challenge` cuando el token coincide. Las peticiones `POST` se validan
-con `X-Hub-Signature-256` usando `WHATSAPP_APP_SECRET`.
-
-### 14.3 Activación segura
-
-1. Mantén `WHATSAPP_ENABLED=False` mientras pruebas el webhook.
-2. Verifica la URL con HTTPS de Render.
-3. Confirma la verificación `GET` en los logs de Render.
-4. No envíes mensajes reales durante las pruebas.
-5. Cuando todo esté validado, cambia a `WHATSAPP_ENABLED=True` y vuelve a
-   desplegar.
-
-Durante `manage.py test` el proyecto fuerza WhatsApp desactivado y no
-realiza envíos reales.
-
----
-
-## 15. Lista de verificación final
+## 14. Lista de verificación final
 
 - [ ] Proyecto de Supabase creado.
 - [ ] Bucket `productos` creado y público.
@@ -602,11 +539,11 @@ realiza envíos reales.
 - [ ] Superusuario creado.
 - [ ] API pública respondiendo.
 - [ ] Imágenes subidas, reemplazadas y eliminadas correctamente.
-- [ ] Webhook de WhatsApp verificado y aún desactivado si no se usa.
+- [ ] Webhook genérico de pedidos validando `X-Webhook-Token`.
 
 ---
 
-## 16. Problemas comunes
+## 15. Problemas comunes
 
 | Síntoma | Causa probable | Solución |
 | --- | --- | --- |

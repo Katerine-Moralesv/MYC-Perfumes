@@ -4,7 +4,6 @@ Django settings for MYC project.
 """
 
 import os
-import sys
 from pathlib import Path
 
 import dj_database_url
@@ -17,9 +16,6 @@ from django.core.exceptions import ImproperlyConfigured
 # =========================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Evita envíos reales de WhatsApp cuando se ejecuta manage.py test.
-TESTING = "test" in sys.argv
 
 
 # =========================================================
@@ -87,7 +83,6 @@ INSTALLED_APPS = [
 
     # Aplicaciones MYC
     "apps.core",
-    "apps.whatsapp",
     "apps.usuarios",
     "apps.catalogo",
     "apps.finanzas",
@@ -335,107 +330,6 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 WEBHOOK_TOKEN = config(
     "WEBHOOK_TOKEN",
-    default="",
-)
-
-
-# =========================================================
-# WHATSAPP CLOUD API (META)
-# =========================================================
-
-# Deshabilitada por defecto. Durante las pruebas se fuerza a False para
-# evitar cualquier envío real.
-WHATSAPP_ENABLED = (
-    False
-    if TESTING
-    else config(
-        "WHATSAPP_ENABLED",
-        default=False,
-        cast=bool,
-    )
-)
-
-# Alias legado para instalaciones que ya usaban este nombre.
-WHATSAPP_NOTIFICATIONS_ENABLED = config(
-    "WHATSAPP_NOTIFICATIONS_ENABLED",
-    default=WHATSAPP_ENABLED,
-    cast=bool,
-)
-
-# En producción se ejecuta en un hilo corto después del commit. En tests
-# permanece síncrono para que las aserciones sean deterministas.
-WHATSAPP_ASYNC_ENABLED = (
-    False
-    if TESTING
-    else config(
-        "WHATSAPP_ASYNC_ENABLED",
-        default=True,
-        cast=bool,
-    )
-)
-
-# Token de acceso de Meta. Puede ser el temporal de prueba o el de
-# un usuario del sistema en producción. Nunca debe exponerse al frontend.
-WHATSAPP_ACCESS_TOKEN = config(
-    "WHATSAPP_ACCESS_TOKEN",
-    default="",
-)
-
-# ID del número emisor en Meta (no es el número telefónico).
-WHATSAPP_PHONE_NUMBER_ID = config(
-    "WHATSAPP_PHONE_NUMBER_ID",
-    default="",
-)
-
-WHATSAPP_BUSINESS_ACCOUNT_ID = config(
-    "WHATSAPP_BUSINESS_ACCOUNT_ID",
-    default="",
-)
-
-# Número autorizado que recibe las notificaciones del administrador.
-# Debe incluir indicativo internacional, por ejemplo 573001234567.
-WHATSAPP_ADMIN_PHONE = config(
-    "WHATSAPP_ADMIN_PHONE",
-    default="",
-)
-
-# Alias legado. El servicio usa ADMIN_PHONE y, si está vacío, este valor.
-WHATSAPP_ADMIN_NUMBER = config(
-    "WHATSAPP_ADMIN_NUMBER",
-    default="",
-)
-
-WHATSAPP_API_VERSION = config(
-    "WHATSAPP_API_VERSION",
-    default="v23.0",
-)
-
-WHATSAPP_TIMEOUT_SECONDS = config(
-    "WHATSAPP_TIMEOUT_SECONDS",
-    default=10,
-    cast=int,
-)
-
-# Plantilla aprobada para mensajes iniciados por la empresa. Si está
-# vacía se envía texto libre, válido dentro de la ventana de atención.
-WHATSAPP_TEMPLATE_NAME = config(
-    "WHATSAPP_TEMPLATE_NAME",
-    default="",
-)
-
-WHATSAPP_TEMPLATE_LANGUAGE = config(
-    "WHATSAPP_TEMPLATE_LANGUAGE",
-    default="es",
-)
-
-# Verificación de webhooks de Meta.
-WHATSAPP_VERIFY_TOKEN = config(
-    "WHATSAPP_VERIFY_TOKEN",
-    default="",
-)
-
-WHATSAPP_APP_SECRET = config(
-    "WHATSAPP_APP_SECRET",
     default="",
 )
 

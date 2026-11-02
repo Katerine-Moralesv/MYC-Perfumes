@@ -16,7 +16,6 @@
 .ventas-panel { width: 100%; min-width: 0; padding: 25px; border: 1px solid #f0dbd5; border-radius: 17px; background: rgba(255, 252, 249, .94); box-shadow: 0 7px 22px rgba(113, 73, 68, .035); }
 .ventas-section-title { display: flex; align-items: flex-start; gap: 13px; margin: 0 0 22px; }
 .ventas-small-icon { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 50%; color: #bb7a80; background: #f9e7e5; }
-.ventas-whatsapp-icon { color: #9c8064; background: #f4ecdf; }
 .ventas-section-title h2 { margin: 0; color: #42373b; font-size: 18px; font-weight: 700; }
 .ventas-section-title p { margin: 5px 0 0; color: #8a7d82; font-size: 13px; line-height: 1.5; }
 .ventas-form { display: flex; flex-direction: column; gap: 19px; }

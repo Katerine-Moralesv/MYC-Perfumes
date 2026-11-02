@@ -14,7 +14,7 @@ def obtener_o_crear_cliente_por_telefono(
     cliente, _ = Cliente.objects.get_or_create(
         telefono=telefono_normalizado,
         defaults={
-            "nombre": nombre or "Cliente WhatsApp"
+            "nombre": nombre or "Cliente"
         },
     )
 

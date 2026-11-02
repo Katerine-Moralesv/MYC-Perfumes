@@ -65,11 +65,6 @@ urlpatterns = [
         "api/v1/pedidos/",
         include("apps.pedidos.urls"),
     ),
-
-    path(
-        "api/v1/whatsapp/",
-        include("apps.whatsapp.urls"),
-    ),
 ]
 
 

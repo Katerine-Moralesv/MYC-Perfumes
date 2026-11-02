@@ -138,10 +138,10 @@ def _respuesta_pedido(pedido, reutilizado):
 
 class WebhookPedidoView(APIView):
     """
-    Endpoint público utilizado por el bot de WhatsApp.
+    Endpoint público para la creación de pedidos desde integraciones externas.
 
-    No utiliza JWT porque el bot no es un usuario de la aplicación.
-    En su lugar exige un token secreto enviado mediante:
+    No utiliza JWT porque el cliente del webhook no es un usuario de la
+    aplicación. En su lugar exige un token secreto enviado mediante:
         X-Webhook-Token: <token>
 
     También tiene rate limiting para reducir abuso básico.
