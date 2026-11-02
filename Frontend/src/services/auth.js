@@ -20,9 +20,11 @@ export async function actualizarPerfil(datos) {
 }
 
 export async function solicitarRecuperacion(email) {
-  const { data } = await api.post("/usuarios/password/solicitar/", {
-    email,
-  });
+  const { data } = await api.post(
+    "/usuarios/password/solicitar/",
+    { email },
+    { timeout: 12000 },
+  );
 
   return data;
 }

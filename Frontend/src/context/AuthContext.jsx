@@ -7,7 +7,12 @@ import {
 } from "../services/auth";
 import { setAuthExpiredHandler } from "../services/api";
 import {
+  cerrarNotificaciones,
+  leerTokenLocal,
+} from "../services/notificaciones.js";
+import {
   clearTokens,
+  getAccessToken,
   getAccessTokenExpiration,
   hasStoredSession,
   setTokens,
@@ -19,19 +24,32 @@ export function AuthProvider({ children }) {
   const [status, setStatus] = useState("loading");
   const [authNotice, setAuthNotice] = useState("");
 
+  const limpiarNotificacionesDeSesion = useCallback(() => {
+    const tokenFcm = leerTokenLocal();
+
+    if (!tokenFcm) return;
+
+    void cerrarNotificaciones({
+      token: tokenFcm,
+      accessToken: getAccessToken(),
+    }).catch(() => {});
+  }, []);
+
   const cerrarSesion = useCallback(() => {
+    limpiarNotificacionesDeSesion();
     clearTokens();
     setUser(null);
     setStatus("anonymous");
     setAuthNotice("");
-  }, []);
+  }, [limpiarNotificacionesDeSesion]);
 
   const expirarSesion = useCallback(() => {
+    limpiarNotificacionesDeSesion();
     clearTokens();
     setUser(null);
     setStatus("anonymous");
     setAuthNotice("Tu sesión expiró. Inicia sesión nuevamente.");
-  }, []);
+  }, [limpiarNotificacionesDeSesion]);
 
   const refrescarPerfil = useCallback(async () => {
     const perfil = await obtenerPerfil();

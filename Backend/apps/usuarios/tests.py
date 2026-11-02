@@ -1,4 +1,6 @@
 import re
+import threading
+import time
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -429,6 +431,46 @@ class AutenticacionTests(APITestCase):
             usuario=self.admin
         )
         self.assertIsNotNone(recuperacion.usado_en)
+
+    @override_settings(
+        EMAIL_BACKEND=(
+            "django.core.mail.backends.console.EmailBackend"
+        ),
+        PASSWORD_RECOVERY_EMAIL_WAIT_SECONDS=0,
+    )
+    @patch("apps.usuarios.views.send_mail")
+    def test_solicitud_responde_aunque_el_correo_siga_en_curso(
+        self,
+        send_mail_mock,
+    ):
+        self.admin.email = "admin_auth@example.com"
+        self.admin.save(update_fields=["email"])
+
+        inicio = threading.Event()
+        liberar = threading.Event()
+
+        def enviar_lento(**kwargs):
+            inicio.set()
+            liberar.wait(timeout=2)
+            return 1
+
+        send_mail_mock.side_effect = enviar_lento
+
+        try:
+            respuesta = self.client.post(
+                "/api/v1/usuarios/password/solicitar/",
+                {"email": self.admin.email},
+                format="json",
+            )
+
+            self.assertEqual(
+                respuesta.status_code,
+                status.HTTP_200_OK,
+            )
+            self.assertTrue(inicio.wait(timeout=1))
+        finally:
+            liberar.set()
+            time.sleep(0.1)
 
     def test_codigo_expirado_no_permite_verificar(self):
         cache.clear()

@@ -1,4 +1,5 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from datetime import timedelta
 
 from django.conf import settings
@@ -29,11 +30,63 @@ from apps.usuarios.serializers import (
 logger = logging.getLogger(__name__)
 
 
+_EMAIL_EXECUTOR = ThreadPoolExecutor(
+    max_workers=2,
+    thread_name_prefix="myc-recuperacion-email",
+)
+
+
 def _smtp_configurado():
     if "smtp" not in settings.EMAIL_BACKEND.lower():
         return True
 
     return bool(settings.EMAIL_HOST)
+
+
+def _enviar_correo_recuperacion(*, destinatario, nombre, codigo):
+    try:
+        enviados = send_mail(
+            subject="Código de recuperación - MYC Perfumes",
+            message=(
+                f"Hola {nombre},\n\n"
+                f"Tu código de recuperación es: {codigo}\n\n"
+                "Este código es válido durante 10 minutos.\n"
+                "Si no solicitaste recuperar tu contraseña, "
+                "puedes ignorar este mensaje.\n\n"
+                "MYC Perfumes"
+            ),
+            from_email=None,
+            recipient_list=[destinatario],
+            fail_silently=False,
+        )
+
+        if not enviados:
+            raise RuntimeError(
+                "El backend de correo no confirmó el envío."
+            )
+
+        return True, ""
+    except Exception as exc:
+        logger.error(
+            "No se pudo enviar el correo de recuperación: %s",
+            type(exc).__name__,
+        )
+        return False, type(exc).__name__
+
+
+def _marcar_recuperacion_usada(recuperacion_id):
+    try:
+        RecuperacionPassword.objects.filter(
+            pk=recuperacion_id,
+            usado_en__isnull=True,
+        ).update(usado_en=timezone.now())
+    except Exception:
+        logger.exception(
+            "No se pudo invalidar la recuperación tras fallar el correo."
+        )
+
+
+
 
 
 class LoginView(TokenObtainPairView):
@@ -150,33 +203,77 @@ class SolicitarRecuperacionView(APIView):
             expira_en=timezone.now() + timedelta(minutes=10),
         )
 
+        futuro = _EMAIL_EXECUTOR.submit(
+            _enviar_correo_recuperacion,
+            destinatario=usuario.email,
+            nombre=usuario.first_name or usuario.username,
+            codigo=codigo,
+        )
+
         try:
-            enviados = send_mail(
-                subject="Código de recuperación - MYC Perfumes",
-                message=(
-                    f"Hola {usuario.first_name or usuario.username},\n\n"
-                    f"Tu código de recuperación es: {codigo}\n\n"
-                    "Este código es válido durante 10 minutos.\n"
-                    "Si no solicitaste recuperar tu contraseña, "
-                    "puedes ignorar este mensaje.\n\n"
-                    "MYC Perfumes"
+            espera = max(
+                0,
+                int(
+                    getattr(
+                        settings,
+                        "PASSWORD_RECOVERY_EMAIL_WAIT_SECONDS",
+                        3,
+                    )
                 ),
-                from_email=None,
-                recipient_list=[usuario.email],
-                fail_silently=False,
+            )
+        except (TypeError, ValueError):
+            espera = 3
+
+        try:
+            enviado, error_tipo = futuro.result(timeout=espera)
+        except FutureTimeoutError:
+            logger.warning(
+                "El envío del correo de recuperación sigue en curso; "
+                "se respondió sin esperar al proveedor."
             )
 
-            if not enviados:
-                raise RuntimeError(
-                    "El backend de correo no confirmó el envío."
-                )
-        except Exception as exc:
+            def _al_terminar(futuro_correo):
+                try:
+                    envio_tardio, error_tardio = futuro_correo.result()
+                except Exception:
+                    envio_tardio, error_tardio = False, "Error"
+
+                if not envio_tardio:
+                    _marcar_recuperacion_usada(recuperacion.pk)
+                    logger.error(
+                        "Falló el envío tardío del correo de "
+                        "recuperación: %s",
+                        error_tardio,
+                    )
+
+            futuro.add_done_callback(_al_terminar)
+
+            return Response(
+                {"detail": mensaje},
+                status=status.HTTP_200_OK,
+            )
+        except Exception:
+            logger.exception(
+                "Error inesperado al preparar el correo de recuperación."
+            )
+            _marcar_recuperacion_usada(recuperacion.pk)
+
+            return Response(
+                {
+                    "detail": (
+                        "No se pudo enviar el código de recuperación. "
+                        "Inténtalo más tarde."
+                    )
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+        if not enviado:
             logger.error(
                 "No se pudo enviar el correo de recuperación: %s",
-                type(exc).__name__,
+                error_tipo,
             )
-            recuperacion.usado_en = timezone.now()
-            recuperacion.save(update_fields=["usado_en"])
+            _marcar_recuperacion_usada(recuperacion.pk)
 
             return Response(
                 {

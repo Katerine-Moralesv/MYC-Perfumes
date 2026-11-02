@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import logoMYC from "../../assets/logo-myc.png";
+import logoMYC from "../../assets/logo-myc.webp";
 import "./Dashboard.css";
 import Catalogo from "../Catalogo/Catalogo";
 import Ventas from "../Ventas/Ventas";
@@ -375,11 +375,17 @@ function GraficaLineas({ datos, escala, puntos, ariaLabel }) {
   );
 }
 
-function Dashboard({ onCerrarSesion }) {
+function Dashboard({
+  onCerrarSesion,
+  pedidoInicialId = null,
+  onPedidoInicialAbierto,
+  notificaciones,
+}) {
   const { user, isAdmin } = useAuth();
   const [seccion, setSeccion] = useState(() =>
     isAdmin ? "Dashboard" : "Ventas",
   );
+  const [pedidoDestinoId, setPedidoDestinoId] = useState(null);
   const [mes, setMes] = useState(obtenerMesActual);
   const mesActual = obtenerMesActual();
 
@@ -414,6 +420,13 @@ function Dashboard({ onCerrarSesion }) {
     { nombre: "Compras", icono: "compras", soloAdmin: true },
     { nombre: "Clientes", icono: "clientes" },
   ].filter((item) => !item.soloAdmin || isAdmin);
+
+  useEffect(() => {
+    if (!pedidoInicialId || !isAdmin) return;
+
+    setSeccion("Pedidos");
+    setPedidoDestinoId(pedidoInicialId);
+  }, [pedidoInicialId, isAdmin]);
 
   useEffect(() => {
     if (!isAdmin || seccionActual !== "Dashboard") {
@@ -586,7 +599,13 @@ function Dashboard({ onCerrarSesion }) {
           </button>
 
           <div className="dash-brand">
-            <img src={logoMYC} alt="MYC Perfumes" />
+            <img
+              src={logoMYC}
+              alt="MYC Perfumes"
+              width="256"
+              height="256"
+              decoding="async"
+            />
             <span />
           </div>
 
@@ -710,13 +729,19 @@ function Dashboard({ onCerrarSesion }) {
         ) : seccionActual === "Ventas" ? (
           <Ventas />
         ) : seccionActual === "Pedidos" ? (
-          <Pedidos />
+          <Pedidos
+            pedidoInicialId={pedidoDestinoId}
+            onPedidoInicialAbierto={(abiertoId) => {
+              setPedidoDestinoId(null);
+              onPedidoInicialAbierto?.(abiertoId);
+            }}
+          />
         ) : seccionActual === "Compras" ? (
           <Compras />
         ) : seccionActual === "Clientes" ? (
           <Clientes />
         ) : seccionActual === "Configuración" ? (
-          <Configuracion />
+          <Configuracion notificaciones={notificaciones} />
         ) : (
           <>
             {cargandoDashboard ? (

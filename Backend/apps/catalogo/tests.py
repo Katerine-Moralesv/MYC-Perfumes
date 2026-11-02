@@ -1030,3 +1030,71 @@ class FamiliasOlfativasGestionTests(APITestCase):
         )
         self.familia_vacia.refresh_from_db()
         self.assertEqual(self.familia_vacia.nombre, "Amaderada")
+
+
+class CatalogoConsultasTests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        categoria, _ = Categoria.objects.get_or_create(
+            nombre="Mujer"
+        )
+        familia, _ = FamiliaOlfativa.objects.get_or_create(
+            nombre="Floral"
+        )
+
+        for indice in range(5):
+            producto = Producto.objects.create(
+                categoria=categoria,
+                nombre=f"Perfume {indice}",
+                descripcion="Producto de prueba",
+                precio=Decimal("100000.00"),
+                contenido_ml=100,
+                dias_entrega=1,
+                activo=True,
+            )
+            producto.familias_olfativas.set([familia])
+
+    def test_listado_publico_usa_consultas_fijas(self):
+        with self.assertNumQueries(2):
+            respuesta = self.client.get(
+                "/api/v1/catalogo/productos/"
+            )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(len(respuesta.data), 5)
+
+
+class CatalogoCachePublicoTests(APITestCase):
+    def test_catalogo_publico_permite_cache_corta(self):
+        respuesta = self.client.get(
+            "/api/v1/catalogo/productos/"
+        )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertIn(
+            "public",
+            respuesta["Cache-Control"],
+        )
+        self.assertIn("Authorization", respuesta["Vary"])
+
+    def test_catalogo_con_autorizacion_no_se_cachea(self):
+        respuesta = self.client.get(
+            "/api/v1/catalogo/productos/",
+            HTTP_AUTHORIZATION="Bearer token-de-prueba",
+        )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(
+            respuesta["Cache-Control"],
+            "no-store",
+        )
+        self.assertIn("Authorization", respuesta["Vary"])

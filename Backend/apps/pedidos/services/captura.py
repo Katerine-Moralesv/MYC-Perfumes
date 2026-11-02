@@ -12,6 +12,9 @@ from apps.pedidos.models import Pedido, DetallePedido
 from apps.pedidos.repositories import (
     obtener_o_crear_cliente_por_telefono,
 )
+from apps.notificaciones.services.pedidos import (
+    notificar_pedido_creado,
+)
 
 
 MAX_CANTIDAD_POR_LINEA = 100
@@ -234,5 +237,11 @@ def registrar_pedido(
 
     pedido.total = total
     pedido.save(update_fields=["total"])
+
+    # Solo se notifica cuando la transacción ya fue confirmada.
+    # Un fallo de Firebase no puede revertir el pedido guardado.
+    transaction.on_commit(
+        lambda: notificar_pedido_creado(pedido.pk)
+    )
 
     return pedido

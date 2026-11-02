@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  buscarPedidoInicial,
   calcularTotalEstimado,
   construirLineasPrecioConfirmacion,
   construirPedidosDesdeVentasPendientes,
@@ -376,4 +377,17 @@ test("no inventa saldo cuando el precio está pendiente", () => {
 
   assert.equal(pedidoPuedeRegistrarAnticipo(pendiente), false);
   assert.equal(pedidoPendienteDeCompra(pendiente), false);
+});
+
+test("encuentra un pedido nuevo en la lista actualizada", () => {
+  const listaAnterior = [{ id: 1, estado: "pendiente" }];
+  const listaActualizada = [
+    { id: 1, estado: "pendiente" },
+    { id: 99, estado: "pendiente", cliente_nombre: "Nueva" },
+  ];
+
+  assert.equal(buscarPedidoInicial(listaAnterior, 99), null);
+  assert.equal(buscarPedidoInicial(listaActualizada, 99).id, 99);
+  assert.equal(buscarPedidoInicial(listaActualizada, "1").id, 1);
+  assert.equal(buscarPedidoInicial([], 99), null);
 });

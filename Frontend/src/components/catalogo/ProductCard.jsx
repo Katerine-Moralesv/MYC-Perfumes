@@ -9,7 +9,12 @@ function ProductCard({
   return (
     <article className="product-card">
       <div className="product-card__image">
-        <img src={imagen} alt={nombre} />
+        <img
+          src={imagen}
+          alt={nombre}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
 
       <div className="product-card__info">

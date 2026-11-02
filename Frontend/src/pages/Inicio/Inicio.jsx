@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import logoMYC from "../../assets/logo-myc.png";
-import fondoFloral from "../../assets/fondo-floral.png";
+import logoMYC from "../../assets/logo-myc.webp";
+import fondoFloral from "../../assets/fondo-floral.webp";
 import "./Inicio.css";
 
 import {
-  listarCategorias,
-  listarFamiliasOlfativas,
   listarProductos,
   resolverUrlMedia,
 } from "../../services/catalogo.js";
@@ -289,6 +287,7 @@ function ImagenProducto({ src, alt }) {
       src={src}
       alt={alt}
       loading="lazy"
+      decoding="async"
       onError={() => setError(true)}
     />
   );
@@ -1303,53 +1302,19 @@ function Inicio({ onVerCatalogo, onAdminLogin }) {
       setErrorCatalogo("");
 
       try {
-        const resultados = await Promise.allSettled([
-          listarProductos({ signal: controlador.signal }),
-          listarCategorias({ signal: controlador.signal }),
-          listarFamiliasOlfativas({ signal: controlador.signal }),
-        ]);
+        const productosApi = await listarProductos({
+          signal: controlador.signal,
+        });
 
         if (!activo) return;
 
-        const [
-          productosResultado,
-          categoriasResultado,
-          familiasResultado,
-        ] = resultados;
-
-        if (productosResultado.status === "rejected") {
-          throw productosResultado.reason;
-        }
-
         const productosNormalizados = (
-          productosResultado.value || []
+          productosApi || []
         ).map(normalizarProducto);
 
-        const categoriasApi =
-          categoriasResultado.status === "fulfilled"
-            ? categoriasResultado.value
-                .map((categoria) => String(categoria?.nombre || "").trim())
-                .filter(Boolean)
-            : [];
-
-        const familiasApi =
-          familiasResultado.status === "fulfilled"
-            ? familiasResultado.value
-                .map((item) => String(item?.nombre || "").trim())
-                .filter(Boolean)
-            : [];
-
         setProductos(productosNormalizados);
-        setCategorias(
-          categoriasApi.length
-            ? categoriasApi
-            : derivarCategorias(productosNormalizados)
-        );
-        setFamilias(
-          familiasApi.length
-            ? familiasApi
-            : derivarFamilias(productosNormalizados)
-        );
+        setCategorias(derivarCategorias(productosNormalizados));
+        setFamilias(derivarFamilias(productosNormalizados));
       } catch (error) {
         if (!activo || error?.isCanceled) return;
 
@@ -1653,7 +1618,13 @@ function Inicio({ onVerCatalogo, onAdminLogin }) {
             onClick={() => onAdminLogin?.()}
             aria-label="Abrir administración de MYC Perfumes"
           >
-            <img src={logoMYC} alt="Logo MYC Perfumes" />
+            <img
+              src={logoMYC}
+              alt="Logo MYC Perfumes"
+              width="256"
+              height="256"
+              decoding="async"
+            />
             <span className="inicio-marca-separador" />
             <span className="inicio-marca-texto">
               <strong>Perfumes MYC</strong>
@@ -1863,6 +1834,7 @@ function Inicio({ onVerCatalogo, onAdminLogin }) {
                 src={nosotrosHeroImagen}
                 alt={nosotrosHeroAlt}
                 loading="eager"
+                decoding="async"
                 onError={() => setNosotrosImageError(true)}
               />
               <div className="nosotros-editorial-sello">
@@ -1928,6 +1900,8 @@ function Inicio({ onVerCatalogo, onAdminLogin }) {
                 src={heroImagen}
                 alt={heroAlt}
                 loading="eager"
+                decoding="async"
+                fetchPriority="high"
                 onError={() => setHeroError(true)}
               />
               <div className="inicio-hero-foto-sello"><span>MYC</span><small>PERFUMES</small></div>
@@ -2019,7 +1993,13 @@ function Inicio({ onVerCatalogo, onAdminLogin }) {
 
       <footer className="inicio-footer">
         <div className="inicio-footer-marca">
-          <img src={logoMYC} alt="" />
+          <img
+            src={logoMYC}
+            alt=""
+            width="256"
+            height="256"
+            decoding="async"
+          />
           <span><strong>MYC Perfumes</strong><small>Tu aroma, tu esencia</small></span>
         </div>
         <p>Una fragancia, una historia, tu esencia.</p>

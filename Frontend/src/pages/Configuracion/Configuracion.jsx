@@ -76,6 +76,12 @@ function Icono({ tipo, size = 20 }) {
         <path d="M7 3v6h10V3M7 21v-7h10v7" />
       </>
     ),
+    campana: (
+      <>
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+        <path d="M10 21a2 2 0 0 0 4 0" />
+      </>
+    ),
   };
 
   return <svg {...props}>{dibujos[tipo] || dibujos.usuario}</svg>;
@@ -99,7 +105,7 @@ const formularioAdminVacio = {
   is_active: true,
 };
 
-export default function Configuracion() {
+export default function Configuracion({ notificaciones } = {}) {
   const {
     user,
     isAdmin,
@@ -432,6 +438,92 @@ export default function Configuracion() {
             </p>
           </form>
         </section>
+
+        {isAdmin && notificaciones && (
+          <section className="configuracion-panel">
+            <div className="configuracion-titulo-seccion">
+              <span className="configuracion-icono">
+                <Icono tipo="campana" size={20} />
+              </span>
+              <div>
+                <h2>Notificaciones de pedidos</h2>
+                <p>
+                  Recibe un aviso en este dispositivo cuando una
+                  clienta registre un pedido.
+                </p>
+              </div>
+            </div>
+
+            <div className="configuracion-notificaciones">
+              {notificaciones.soportado === false ? (
+                <p
+                  className="configuracion-mensaje error"
+                  role="alert"
+                >
+                  {notificaciones.error ||
+                    "Este navegador no soporta notificaciones push."}
+                </p>
+              ) : (
+                <>
+                  <p className="configuracion-notificaciones-estado">
+                    Estado:{" "}
+                    <strong>
+                      {notificaciones.activo
+                        ? "Activadas"
+                        : "Desactivadas"}
+                    </strong>
+                  </p>
+
+                  {notificaciones.error && (
+                    <p
+                      className="configuracion-mensaje error"
+                      role="alert"
+                    >
+                      {notificaciones.error}
+                    </p>
+                  )}
+
+                  {notificaciones.mensaje && (
+                    <p
+                      className="configuracion-mensaje exito"
+                      role="status"
+                    >
+                      {notificaciones.mensaje}
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    className={
+                      notificaciones.activo
+                        ? "configuracion-boton-secundario"
+                        : "configuracion-boton-principal"
+                    }
+                    onClick={
+                      notificaciones.activo
+                        ? notificaciones.desactivar
+                        : notificaciones.activar
+                    }
+                    disabled={notificaciones.cargando}
+                  >
+                    <Icono tipo="campana" size={17} />
+                    {notificaciones.cargando
+                      ? "Procesando..."
+                      : notificaciones.activo
+                        ? "Desactivar notificaciones"
+                        : "Activar notificaciones"}
+                  </button>
+
+                  <p className="configuracion-nota">
+                    Solo los administradores pueden activar las
+                    notificaciones. El navegador solicitará permiso
+                    una sola vez.
+                  </p>
+                </>
+              )}
+            </div>
+          </section>
+        )}
 
         {isAdmin && (
           <section className="configuracion-panel configuracion-panel-admins">

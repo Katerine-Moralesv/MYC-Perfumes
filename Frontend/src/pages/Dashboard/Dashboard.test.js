@@ -56,7 +56,7 @@ test("las gráficas usan barras verticales sin badges de categoría", () => {
 test("el Dashboard conserva la identidad floral y rosada del mockup", () => {
   assert.match(estilos, /--dash-rosa:\s*#e9a9a5/);
   assert.match(estilos, /--dash-rosa-oscuro:\s*#d8898f/);
-  assert.match(estilos, /fondo-floral\.png/);
+  assert.match(estilos, /fondo-floral\.(png|webp)/);
   assert.doesNotMatch(estilos, /beige|salvia/i);
 });
 

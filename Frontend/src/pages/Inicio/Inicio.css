@@ -4079,7 +4079,7 @@
       rgba(245, 232, 216, 0.86),
       rgba(255, 249, 243, 0.7)
     ),
-    url("../../assets/fondo-floral.png");
+    url("../../assets/fondo-floral.webp");
   background-position: center 55%;
   background-repeat: no-repeat;
   background-size: cover;
@@ -4132,7 +4132,7 @@
   height: 190px;
   pointer-events: none;
   opacity: 0.1;
-  background-image: url("../../assets/fondo-floral.png");
+  background-image: url("../../assets/fondo-floral.webp");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

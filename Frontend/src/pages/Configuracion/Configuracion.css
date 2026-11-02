@@ -604,3 +604,21 @@
     padding: 22px 17px;
   }
 }
+
+.configuracion-notificaciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.configuracion-notificaciones-estado {
+  margin: 0;
+  color: #594649;
+  font-size: 13px;
+}
+
+.configuracion-notificaciones-estado strong {
+  color: #8d6069;
+}

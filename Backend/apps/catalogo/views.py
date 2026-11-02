@@ -36,6 +36,39 @@ class CatalogoPublicoMixin:
 
         return super().get_authenticators()
 
+    def _aplicar_cache_publica(self, response):
+        if self.request.method != "GET":
+            return response
+
+        tiene_autorizacion = bool(
+            self.request.headers.get("Authorization")
+        )
+
+        if tiene_autorizacion:
+            response["Cache-Control"] = "no-store"
+        else:
+            response["Cache-Control"] = (
+                "public, max-age=30, stale-while-revalidate=60"
+            )
+
+        vary = response.get("Vary", "")
+        valores_vary = {
+            valor.strip()
+            for valor in vary.split(",")
+            if valor.strip()
+        }
+        valores_vary.add("Authorization")
+        response["Vary"] = ", ".join(sorted(valores_vary))
+        return response
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return self._aplicar_cache_publica(response)
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return self._aplicar_cache_publica(response)
+
 
 class CategoriaListCreateView(
     CatalogoPublicoMixin,

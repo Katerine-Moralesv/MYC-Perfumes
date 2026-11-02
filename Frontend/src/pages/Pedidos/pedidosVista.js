@@ -283,3 +283,15 @@ export function resumenPagoPedido(pedido) {
     ),
   };
 }
+
+export function buscarPedidoInicial(pedidos, pedidoId) {
+  const objetivo = String(pedidoId ?? "").trim();
+
+  if (!objetivo) return null;
+
+  return (
+    (Array.isArray(pedidos) ? pedidos : []).find(
+      (pedido) => String(pedido?.id) === objetivo,
+    ) || null
+  );
+}

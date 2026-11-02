@@ -64,6 +64,7 @@ function ImagenProducto({ producto }) {
           src={src}
           alt={`Foto de ${producto.nombre}`}
           loading="lazy"
+          decoding="async"
           onError={() => setErrorImagen(true)}
         />
       ) : (

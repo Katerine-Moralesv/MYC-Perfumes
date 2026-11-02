@@ -1,6 +1,6 @@
 import { useState } from "react";
-import logoMYC from "../../assets/logo-myc.png";
-import fondoFloral from "../../assets/fondo-floral.png";
+import logoMYC from "../../assets/logo-myc.webp";
+import fondoFloral from "../../assets/fondo-floral.webp";
 import "./Login.css";
 
 function Login({ onForgotPassword, onLogin, mensajeInicial = "" }) {
@@ -46,6 +46,9 @@ function Login({ onForgotPassword, onLogin, mensajeInicial = "" }) {
           src={logoMYC}
           alt="MYC Perfumes"
           className="login-logo"
+          width="256"
+          height="256"
+          decoding="async"
         />
 
         <p className="login-label">MYC PERFUMES</p>

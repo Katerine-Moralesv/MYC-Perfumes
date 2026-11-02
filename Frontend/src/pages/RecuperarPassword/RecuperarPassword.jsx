@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import fondoFloral from "../../assets/fondo-floral.png";
-import logoMYC from "../../assets/logo-myc.png";
+import fondoFloral from "../../assets/fondo-floral.webp";
+import logoMYC from "../../assets/logo-myc.webp";
 import {
   restablecerPassword,
   solicitarRecuperacion,
@@ -45,8 +45,10 @@ function RecuperarPassword({ onVolver }) {
       setPaso(2);
     } catch (errorSolicitud) {
       setError(
-        errorSolicitud?.message ||
-          "No se pudo enviar el código. Inténtalo de nuevo."
+        errorSolicitud?.isTimeout
+          ? "El servidor tardó demasiado en responder. Revisa tu conexión e inténtalo de nuevo."
+          : errorSolicitud?.message ||
+              "No se pudo enviar el código. Inténtalo de nuevo."
       );
     } finally {
       setCargando(false);
@@ -197,6 +199,9 @@ function RecuperarPassword({ onVolver }) {
           src={logoMYC}
           alt="MYC Perfumes"
           className="recuperar-logo"
+          width="256"
+          height="256"
+          decoding="async"
         />
 
         <p className="recuperar-label">MYC PERFUMES</p>
@@ -273,6 +278,11 @@ function RecuperarPassword({ onVolver }) {
               Ingresa el código de 6 dígitos que enviamos a:
               <br />
               <strong>{correo}</strong>
+            </p>
+
+            <p className="recuperar-nota">
+              Si no lo recibes en unos minutos, revisa la carpeta de
+              spam o vuelve a solicitar el código.
             </p>
 
             <form onSubmit={handleVerificarCodigo} aria-busy={cargando}>

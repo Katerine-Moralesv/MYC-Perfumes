@@ -11,3 +11,4 @@ whitenoise
 dj-database-url
 django-storages[s3]==1.14.6
 boto3==1.43.123
+firebase-admin==7.7.0

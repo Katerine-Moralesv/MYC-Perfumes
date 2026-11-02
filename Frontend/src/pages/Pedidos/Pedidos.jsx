@@ -18,6 +18,7 @@ import {
 } from "../../services/pedidosAdmin.js";
 import {
   FILTROS_PEDIDO,
+  buscarPedidoInicial,
   calcularTotalEstimado,
   construirLineasPrecioConfirmacion,
   construirPedidosDesdeVentasPendientes,
@@ -268,11 +269,22 @@ function ResumenPago({ pedido }) {
   );
 }
 
-function Pedidos() {
+function Pedidos({
+  pedidoInicialId = null,
+  onPedidoInicialAbierto,
+} = {}) {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState("");
   const [recarga, setRecarga] = useState(0);
+  const [pedidoInicialError, setPedidoInicialError] = useState("");
+  const [pedidoInicialBuscando, setPedidoInicialBuscando] =
+    useState(false);
+  const pedidoInicialObjetivoRef = useRef(null);
+  const pedidoInicialResueltoRef = useRef(null);
+  const onPedidoInicialAbiertoRef = useRef(
+    onPedidoInicialAbierto,
+  );
   const [filtro, setFiltro] = useState("pendiente");
   const [busqueda, setBusqueda] = useState("");
   const [seleccionadoId, setSeleccionadoId] = useState(null);
@@ -300,6 +312,70 @@ function Pedidos() {
   const cancelacionClaveRef = useRef("");
 
   useEffect(() => {
+    onPedidoInicialAbiertoRef.current = onPedidoInicialAbierto;
+  }, [onPedidoInicialAbierto]);
+
+  function procesarPedidoInicial(lista) {
+    const objetivo = pedidoInicialObjetivoRef.current;
+
+    if (
+      !objetivo ||
+      pedidoInicialResueltoRef.current === objetivo
+    ) {
+      return;
+    }
+
+    const pedido = buscarPedidoInicial(lista, objetivo);
+
+    if (!pedido) {
+      setPedidoInicialBuscando(false);
+      setPedidoInicialError(
+        `No se encontró el pedido #${objetivo}. Actualiza la lista e inténtalo de nuevo.`
+      );
+      return;
+    }
+
+    pedidoInicialResueltoRef.current = objetivo;
+    pedidoInicialObjetivoRef.current = null;
+    setPedidoInicialBuscando(false);
+    setPedidoInicialError("");
+    setFiltro("todos");
+    setSeleccionadoId(pedido.id);
+    setModoModal("detalle");
+    setErrorModal("");
+    setAviso("");
+    onPedidoInicialAbiertoRef.current?.(pedido.id);
+  }
+
+  useEffect(() => {
+    if (!pedidoInicialId) {
+      pedidoInicialObjetivoRef.current = null;
+      pedidoInicialResueltoRef.current = null;
+      setPedidoInicialBuscando(false);
+      setPedidoInicialError("");
+      return;
+    }
+
+    const objetivo = String(pedidoInicialId);
+
+    if (
+      pedidoInicialObjetivoRef.current === objetivo &&
+      pedidoInicialResueltoRef.current !== objetivo
+    ) {
+      return;
+    }
+
+    pedidoInicialObjetivoRef.current = objetivo;
+    pedidoInicialResueltoRef.current = null;
+    setSeleccionadoId(null);
+    setModoModal("");
+    setErrorModal("");
+    setPedidoInicialError("");
+    setPedidoInicialBuscando(true);
+    setRecarga((actual) => actual + 1);
+  }, [pedidoInicialId]);
+
+  useEffect(() => {
     const controlador = new AbortController();
     let activo = true;
 
@@ -321,19 +397,28 @@ function Pedidos() {
             ventasPendientes
           );
 
-        setPedidos(
-          [...datos, ...ventasVirtuales].sort((a, b) =>
+        const lista = [...datos, ...ventasVirtuales].sort(
+          (a, b) =>
             String(b.creado_en || "").localeCompare(
               String(a.creado_en || "")
             )
-          )
         );
+
+        setPedidos(lista);
+        procesarPedidoInicial(lista);
       })
       .catch((error) => {
         if (!activo || error.isCanceled) return;
         setErrorCarga(
           error.message || "No se pudieron cargar los pedidos."
         );
+
+        if (pedidoInicialObjetivoRef.current) {
+          setPedidoInicialBuscando(false);
+          setPedidoInicialError(
+            "No se pudo actualizar la lista de pedidos. Inténtalo de nuevo."
+          );
+        }
       })
       .finally(() => {
         if (activo) setCargando(false);
@@ -344,6 +429,20 @@ function Pedidos() {
       controlador.abort();
     };
   }, [recarga]);
+
+  function reintentarPedidoInicial() {
+    const objetivo =
+      pedidoInicialObjetivoRef.current ||
+      (pedidoInicialId ? String(pedidoInicialId) : null);
+
+    if (!objetivo) return;
+
+    pedidoInicialObjetivoRef.current = objetivo;
+    pedidoInicialResueltoRef.current = null;
+    setPedidoInicialError("");
+    setPedidoInicialBuscando(true);
+    setRecarga((actual) => actual + 1);
+  }
 
   const conteos = useMemo(
     () => contarPedidosPorEstado(pedidos),
@@ -825,6 +924,31 @@ function Pedidos() {
           </div>
         </article>
       </div>
+
+      {(pedidoInicialError || pedidoInicialBuscando) &&
+        !modoModal && (
+          <div
+            className={`pedidos-aviso-accion ${
+              pedidoInicialError ? "pedidos-aviso-error" : ""
+            }`}
+            role={pedidoInicialError ? "alert" : "status"}
+          >
+            <span>
+              {pedidoInicialError ||
+                "Actualizando pedidos para abrir la notificación..."}
+            </span>
+
+            {pedidoInicialError && (
+              <button
+                type="button"
+                className="pedidos-boton-reintentar-aviso"
+                onClick={reintentarPedidoInicial}
+              >
+                Reintentar
+              </button>
+            )}
+          </div>
+        )}
 
       {aviso && !modoModal && (
         <div

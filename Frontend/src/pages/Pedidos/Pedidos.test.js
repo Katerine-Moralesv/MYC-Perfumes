@@ -71,3 +71,16 @@ test("Pedidos permite pagos totales o parciales antes de la venta", () => {
   assert.match(pagina, /Saldo por definir/);
   assert.match(pagina, /puedeConfirmarConPrecios/);
 });
+
+test("Pedidos refresca la lista antes de abrir un pedido notificado", () => {
+  assert.match(pagina, /pedidoInicialObjetivoRef/);
+  assert.match(pagina, /procesarPedidoInicial/);
+  assert.match(
+    pagina,
+    /setRecarga\(\(actual\) => actual \+ 1\)/,
+  );
+  assert.match(pagina, /onPedidoInicialAbiertoRef\.current\?\./);
+  assert.match(pagina, /No se encontró el pedido/);
+  assert.match(pagina, /Reintentar/);
+  assert.doesNotMatch(pagina, /onPedidoInicialConsumido/);
+});

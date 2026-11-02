@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "apps.catalogo",
     "apps.finanzas",
     "apps.pedidos",
+    "apps.notificaciones",
 ]
 
 
@@ -335,6 +336,18 @@ WEBHOOK_TOKEN = config(
 
 
 # =========================================================
+# FIREBASE CLOUD MESSAGING
+# =========================================================
+
+# Cuenta de servicio codificada en Base64. Es un secreto privado:
+# no debe guardarse en el repositorio ni exponerse al frontend.
+FIREBASE_CREDENTIALS_BASE64 = config(
+    "FIREBASE_CREDENTIALS_BASE64",
+    default="",
+)
+
+
+# =========================================================
 # IDIOMA Y ZONA HORARIA
 # =========================================================
 
@@ -519,6 +532,15 @@ EMAIL_USE_TLS = config(
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 EMAIL_TIMEOUT = config("EMAIL_TIMEOUT", default=10, cast=int)
+
+# Tiempo máximo que la petición espera al proveedor de correo.
+# Si se agota, la API responde sin bloquear y el envío continúa en
+# segundo plano.
+PASSWORD_RECOVERY_EMAIL_WAIT_SECONDS = config(
+    "PASSWORD_RECOVERY_EMAIL_WAIT_SECONDS",
+    default=3,
+    cast=int,
+)
 
 DEFAULT_FROM_EMAIL = config(
     "DEFAULT_FROM_EMAIL",

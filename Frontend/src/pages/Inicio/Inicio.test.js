@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
@@ -113,4 +113,31 @@ test("Mi colección actualiza solo colores y conserva su estructura", () => {
   );
   assert.match(estilos, /background: #d8dcc9/);
   assert.match(estilos, /background: #fff9f3/);
+});
+
+test("el catálogo público evita endpoints derivables y usa WebP", () => {
+  assert.doesNotMatch(pagina, /listarCategorias/);
+  assert.doesNotMatch(pagina, /listarFamiliasOlfativas/);
+  assert.match(pagina, /derivarCategorias/);
+  assert.match(pagina, /derivarFamilias/);
+
+  const logoWebp = join(
+    directorio,
+    "../../assets/logo-myc.webp",
+  );
+  const logoPng = join(
+    directorio,
+    "../../assets/logo-myc.png",
+  );
+  const fondoWebp = join(
+    directorio,
+    "../../assets/fondo-floral.webp",
+  );
+  const fondoPng = join(
+    directorio,
+    "../../assets/fondo-floral.png",
+  );
+
+  assert.ok(statSync(logoWebp).size < statSync(logoPng).size);
+  assert.ok(statSync(fondoWebp).size < statSync(fondoPng).size);
 });

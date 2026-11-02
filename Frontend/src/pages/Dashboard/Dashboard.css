@@ -19,7 +19,7 @@
       rgba(252, 234, 235, 0.64) 52%,
       rgba(250, 227, 228, 0.6) 100%
     ),
-    url("../../assets/fondo-floral.png");
+    url("../../assets/fondo-floral.webp");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -51,7 +51,7 @@
   height: 100%;
   pointer-events: none;
   opacity: 0.55;
-  background-image: url("../../assets/fondo-floral.png");
+  background-image: url("../../assets/fondo-floral.webp");
   background-repeat: no-repeat;
   background-position: right 45%;
   background-size: 220px auto;
@@ -79,7 +79,7 @@
   height: 100%;
   pointer-events: none;
   opacity: 0.5;
-  background-image: url("../../assets/fondo-floral.png");
+  background-image: url("../../assets/fondo-floral.webp");
   background-repeat: no-repeat;
   background-position: left center;
   background-size: 155px auto;
@@ -1385,5 +1385,70 @@
 @media (max-width: 560px) {
   .dash-stats {
     grid-template-columns: 1fr;
+  }
+}
+
+.dash-notificacion-aviso {
+  position: sticky;
+  top: 12px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(1100px, calc(100% - 32px));
+  margin: 16px auto 0;
+  padding: 14px 18px;
+  border: 1px solid #f0d7d3;
+  border-radius: 14px;
+  background: #fff8f5;
+  box-shadow: 0 8px 24px rgba(130, 79, 76, 0.09);
+}
+
+.dash-notificacion-aviso strong {
+  display: block;
+  color: #433436;
+  font-size: 14px;
+}
+
+.dash-notificacion-aviso p {
+  margin: 3px 0 0;
+  color: #817781;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.dash-notificacion-acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.dash-notificacion-acciones button {
+  padding: 9px 14px;
+  border: 1px solid #efddd7;
+  border-radius: 9px;
+  background: #fffaf6;
+  color: #8d6069;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dash-notificacion-acciones button:hover {
+  background: #f9e4e3;
+}
+
+.dash-notificacion-acciones .dash-notificacion-cerrar {
+  padding: 9px 12px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .dash-notificacion-aviso {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

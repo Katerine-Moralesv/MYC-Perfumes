@@ -65,6 +65,11 @@ urlpatterns = [
         "api/v1/pedidos/",
         include("apps.pedidos.urls"),
     ),
+
+    path(
+        "api/v1/notificaciones/",
+        include("apps.notificaciones.urls"),
+    ),
 ]
 
 
