@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from corsheaders.defaults import default_headers
 from decouple import config
 from django.core.exceptions import ImproperlyConfigured
 
@@ -303,6 +304,27 @@ CORS_ALLOWED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+
+# El frontend de producción debe funcionar aunque la variable de
+# Render no esté configurada o tenga un espacio/barra adicional.
+# Se mantiene una lista explícita: no se habilita "*".
+ORIGEN_FRONTEND_PRODUCCION = "https://myc-perfumes.pages.dev"
+
+if ORIGEN_FRONTEND_PRODUCCION not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append(ORIGEN_FRONTEND_PRODUCCION)
+
+# La tienda pública envía Idempotency-Key en el POST de pedidos.
+# Sin incluirlo en esta lista, el preflight responde 200 pero el
+# navegador bloquea el POST antes de llegar a Django.
+CORS_ALLOW_HEADERS = [
+    *default_headers,
+    "idempotency-key",
+]
+
+# La autenticación es JWT mediante Authorization; no se usan cookies
+# cruzadas. Mantenerlo desactivado evita habilitar credenciales CORS
+# innecesariamente.
+CORS_ALLOW_CREDENTIALS = False
 
 
 # =========================================================

@@ -10,6 +10,11 @@ import {
   obtenerUrlServiceWorker,
 } from "./firebase.js";
 
+// Clave pública ficticia con estructura VAPID válida:
+// Base64 URL-safe, 65 bytes y primer byte 0x04.
+const VAPID_PUBLICA_VALIDA =
+  "BAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0A";
+
 const entorno = {
   VITE_FIREBASE_API_KEY: "api-key",
   VITE_FIREBASE_AUTH_DOMAIN: "myc.firebaseapp.com",
@@ -83,7 +88,7 @@ test("obtiene el token usando el Service Worker registrado", async () => {
   let solicitud = null;
 
   const token = await obtenerTokenFCM({
-    vapidKey: "vapid-publica",
+    vapidKey: VAPID_PUBLICA_VALIDA,
     navigatorRef: { serviceWorker: {} },
     messaging,
     registrarServiceWorker: async () => registration,
@@ -95,7 +100,10 @@ test("obtiene el token usando el Service Worker registrado", async () => {
 
   assert.equal(token, "token-fcm");
   assert.equal(solicitud.instancia, messaging);
-  assert.equal(solicitud.opciones.vapidKey, "vapid-publica");
+  assert.equal(
+    solicitud.opciones.vapidKey,
+    VAPID_PUBLICA_VALIDA,
+  );
   assert.equal(
     solicitud.opciones.serviceWorkerRegistration,
     registration,
@@ -113,7 +121,7 @@ test("exige la clave VAPID y un navegador con Service Worker", async () => {
 
   await assert.rejects(
     obtenerTokenFCM({
-      vapidKey: "vapid",
+      vapidKey: VAPID_PUBLICA_VALIDA,
       navigatorRef: {},
     }),
     /Service Workers/,

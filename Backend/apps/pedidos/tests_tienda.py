@@ -1,6 +1,8 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.cache import cache
+from django.test import SimpleTestCase, override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -450,3 +452,177 @@ class RegistrarPedidoTiendaTests(APITestCase):
             status.HTTP_201_CREATED,
         )
         self.assertEqual(Pedido.objects.count(), 1)
+
+    @override_settings(
+        CORS_ALLOWED_ORIGINS=[
+            "https://myc-perfumes.pages.dev"
+        ]
+    )
+    def test_preflight_desde_cloudflare_permite_idempotency_key(self):
+        origen = "https://myc-perfumes.pages.dev"
+
+        respuesta = self.client.options(
+            self.url,
+            HTTP_ORIGIN=origen,
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD="POST",
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS=(
+                "content-type,authorization,idempotency-key"
+            ),
+        )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(
+            respuesta["access-control-allow-origin"],
+            origen,
+        )
+        self.assertIn(
+            "POST",
+            respuesta["access-control-allow-methods"],
+        )
+
+        encabezados = respuesta[
+            "access-control-allow-headers"
+        ].lower()
+
+        self.assertIn("content-type", encabezados)
+        self.assertIn("authorization", encabezados)
+        self.assertIn("idempotency-key", encabezados)
+
+    @override_settings(
+        CORS_ALLOWED_ORIGINS=[
+            "https://myc-perfumes.pages.dev"
+        ]
+    )
+    def test_post_desde_cloudflare_incluye_cors(self):
+        origen = "https://myc-perfumes.pages.dev"
+
+        respuesta = self._post(
+            key="cors-clave-0001",
+            HTTP_ORIGIN=origen,
+        )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_201_CREATED,
+        )
+        self.assertEqual(
+            respuesta["access-control-allow-origin"],
+            origen,
+        )
+        self.assertEqual(Pedido.objects.count(), 1)
+
+    @override_settings(
+        CORS_ALLOWED_ORIGINS=[
+            "https://myc-perfumes.pages.dev"
+        ]
+    )
+    def test_error_por_falta_de_idempotency_key_incluye_cors(self):
+        origen = "https://myc-perfumes.pages.dev"
+
+        respuesta = self.client.post(
+            self.url,
+            self._payload(),
+            format="json",
+            HTTP_ORIGIN=origen,
+        )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+        self.assertEqual(
+            respuesta["access-control-allow-origin"],
+            origen,
+        )
+        self.assertIn("Idempotency-Key", respuesta.data["detail"])
+        self.assertEqual(Pedido.objects.count(), 0)
+
+    @override_settings(
+        CORS_ALLOWED_ORIGINS=[
+            "https://myc-perfumes.pages.dev"
+        ]
+    )
+    def test_error_de_validacion_incluye_cors(self):
+        origen = "https://myc-perfumes.pages.dev"
+        payload = {
+            **self._payload(),
+            "lineas": [],
+        }
+
+        respuesta = self.client.post(
+            self.url,
+            payload,
+            format="json",
+            HTTP_ORIGIN=origen,
+            HTTP_IDEMPOTENCY_KEY="cors-clave-error-0001",
+        )
+
+        self.assertEqual(
+            respuesta.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+        self.assertEqual(
+            respuesta["access-control-allow-origin"],
+            origen,
+        )
+        self.assertEqual(Pedido.objects.count(), 0)
+
+    @override_settings(
+        CORS_ALLOWED_ORIGINS=[
+            "https://myc-perfumes.pages.dev"
+        ]
+    )
+    def test_reintento_idempotente_desde_cloudflare_incluye_cors(self):
+        origen = "https://myc-perfumes.pages.dev"
+
+        primera = self._post(
+            key="cors-clave-idempotente-0001",
+            HTTP_ORIGIN=origen,
+        )
+        segunda = self._post(
+            key="cors-clave-idempotente-0001",
+            HTTP_ORIGIN=origen,
+        )
+
+        self.assertEqual(
+            primera.status_code,
+            status.HTTP_201_CREATED,
+        )
+        self.assertEqual(
+            segunda.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(
+            primera["access-control-allow-origin"],
+            origen,
+        )
+        self.assertEqual(
+            segunda["access-control-allow-origin"],
+            origen,
+        )
+        self.assertEqual(primera.data["id"], segunda.data["id"])
+        self.assertEqual(Pedido.objects.count(), 1)
+
+
+class CorsConfiguracionTests(SimpleTestCase):
+    def test_origen_de_cloudflare_esta_permitido(self):
+        self.assertIn(
+            "https://myc-perfumes.pages.dev",
+            settings.CORS_ALLOWED_ORIGINS,
+        )
+
+    def test_idempotency_key_esta_en_encabezados_permitidos(self):
+        encabezados = {
+            encabezado.lower()
+            for encabezado in settings.CORS_ALLOW_HEADERS
+        }
+
+        self.assertIn("authorization", encabezados)
+        self.assertIn("content-type", encabezados)
+        self.assertIn("idempotency-key", encabezados)
+
+    def test_no_se_habilitan_credenciales_cors(self):
+        self.assertFalse(settings.CORS_ALLOW_CREDENTIALS)
