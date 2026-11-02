@@ -8,6 +8,7 @@ import Compras from "../Compras/Compras";
 import Clientes from "../Clientes/Clientes";
 import Configuracion from "../Configuracion/Configuracion";
 import { obtenerResumenDashboard } from "../../services/dashboardMetricas.js";
+import { invalidarCacheAdmin } from "../../services/adminCache.js";
 import { useAuth } from "../../context/auth-context";
 import {
   construirResumenActual,
@@ -207,6 +208,13 @@ function Icono({ nombre, size = 20 }) {
         <path d="M5 7h14M9 11h6M9 15h6" />
       </>
     ),
+
+    actualizar: (
+      <>
+        <path d="M20 11a8 8 0 1 0-2.3 5.7" />
+        <path d="M20 4v7h-7" />
+      </>
+    ),
   };
 
   return <svg {...comunes}>{dibujos[nombre] || dibujos.inicio}</svg>;
@@ -391,6 +399,7 @@ function Dashboard({
 
   const [menuUsuario, setMenuUsuario] = useState(false);
   const [menuMovil, setMenuMovil] = useState(false);
+  const [versionSeccion, setVersionSeccion] = useState(0);
   const [resumenPeriodo, setResumenPeriodo] = useState(null);
   const [metricasActuales, setMetricasActuales] = useState(null);
   const [pedidosRecientes, setPedidosRecientes] = useState([]);
@@ -435,6 +444,8 @@ function Dashboard({
 
     const controlador = new AbortController();
     let activo = true;
+
+    setErrorDashboard("");
 
     obtenerResumenDashboard(mes, {
       signal: controlador.signal,
@@ -575,13 +586,28 @@ function Dashboard({
       return;
     }
 
-    if (nombre === "Dashboard" && seccionActual !== "Dashboard") {
+    if (
+      nombre === "Dashboard" &&
+      seccionActual !== "Dashboard" &&
+      !resumenPeriodo &&
+      !metricasActuales
+    ) {
       prepararCargaDashboard();
     }
 
     setSeccion(nombre);
     setMenuUsuario(false);
     setMenuMovil(false);
+  }
+
+  function actualizarPanel() {
+    invalidarCacheAdmin();
+    setVersionSeccion((actual) => actual + 1);
+
+    if (seccionActual === "Dashboard") {
+      prepararCargaDashboard();
+      setRecargaDashboard((actual) => actual + 1);
+    }
   }
 
   return (
@@ -628,6 +654,17 @@ function Dashboard({
               </button>
             ))}
           </nav>
+
+          <button
+            type="button"
+            className="dash-refresh"
+            onClick={actualizarPanel}
+            title="Actualizar datos del panel"
+            aria-label="Actualizar datos del panel"
+          >
+            <Icono nombre="actualizar" size={17} />
+            <span>Actualizar</span>
+          </button>
 
           <div className="dash-user-wrap">
             <button
@@ -725,11 +762,12 @@ function Dashboard({
         )}
 
         {seccionActual === "Catálogo" ? (
-          <Catalogo />
+          <Catalogo key={`catalogo-${versionSeccion}`} />
         ) : seccionActual === "Ventas" ? (
-          <Ventas />
+          <Ventas key={`ventas-${versionSeccion}`} />
         ) : seccionActual === "Pedidos" ? (
           <Pedidos
+            key={`pedidos-${versionSeccion}`}
             pedidoInicialId={pedidoDestinoId}
             onPedidoInicialAbierto={(abiertoId) => {
               setPedidoDestinoId(null);
@@ -737,11 +775,14 @@ function Dashboard({
             }}
           />
         ) : seccionActual === "Compras" ? (
-          <Compras />
+          <Compras key={`compras-${versionSeccion}`} />
         ) : seccionActual === "Clientes" ? (
-          <Clientes />
+          <Clientes key={`clientes-${versionSeccion}`} />
         ) : seccionActual === "Configuración" ? (
-          <Configuracion notificaciones={notificaciones} />
+          <Configuracion
+            key={`configuracion-${versionSeccion}`}
+            notificaciones={notificaciones}
+          />
         ) : (
           <>
             {cargandoDashboard ? (

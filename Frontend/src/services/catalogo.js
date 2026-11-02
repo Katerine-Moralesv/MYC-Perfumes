@@ -1,4 +1,9 @@
 import { API_BASE_URL, api } from "./api.js";
+import {
+  TTL_ADMIN,
+  invalidarCacheAdmin,
+  obtenerConCache,
+} from "./adminCache.js";
 
 function extraerLista(datos) {
   if (Array.isArray(datos)) return datos;
@@ -12,15 +17,35 @@ export async function listarProductos({ signal } = {}) {
 }
 
 export async function listarCategorias({ signal } = {}) {
-  const { data } = await api.get("/catalogo/categorias/", { signal });
-  return extraerLista(data);
+  return obtenerConCache(
+    "catalogo:categorias",
+    async () => {
+      const { data } = await api.get(
+        "/catalogo/categorias/",
+      );
+      return extraerLista(data);
+    },
+    {
+      ttl: TTL_ADMIN.catalogo,
+      signal,
+    },
+  );
 }
 
 export async function listarFamiliasOlfativas({ signal } = {}) {
-  const { data } = await api.get("/catalogo/familias-olfativas/", {
-    signal,
-  });
-  return extraerLista(data);
+  return obtenerConCache(
+    "catalogo:familias",
+    async () => {
+      const { data } = await api.get(
+        "/catalogo/familias-olfativas/",
+      );
+      return extraerLista(data);
+    },
+    {
+      ttl: TTL_ADMIN.catalogo,
+      signal,
+    },
+  );
 }
 
 export function normalizarNombreFamilia(nombre) {
@@ -76,6 +101,7 @@ export async function crearFamiliaOlfativa(nombre) {
     "/catalogo/familias-olfativas/",
     { nombre: nombreLimpio },
   );
+  invalidarCacheAdmin();
 
   return data;
 }
@@ -87,6 +113,7 @@ export async function actualizarFamiliaOlfativa(id, nombre) {
     `/catalogo/familias-olfativas/${id}/`,
     { nombre: nombreLimpio },
   );
+  invalidarCacheAdmin();
 
   return data;
 }
@@ -95,6 +122,7 @@ export async function eliminarFamiliaOlfativa(id) {
   const { data } = await api.delete(
     `/catalogo/familias-olfativas/${id}/`,
   );
+  invalidarCacheAdmin();
 
   return data;
 }

@@ -1388,6 +1388,43 @@
   }
 }
 
+.dash-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  flex-shrink: 0;
+  padding: 0 13px;
+  border: 1px solid #f0ddd8;
+  border-radius: 10px;
+  background: #fffaf6;
+  color: #8d6069;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dash-refresh:hover {
+  background: #fcedec;
+  color: #ce777e;
+}
+
+@media (max-width: 760px) {
+  .dash-refresh {
+    order: 2;
+    padding: 0 10px;
+  }
+
+  .dash-refresh span {
+    display: none;
+  }
+
+  .dash-user-wrap {
+    order: 3;
+  }
+}
+
 .dash-notificacion-aviso {
   position: sticky;
   top: 12px;

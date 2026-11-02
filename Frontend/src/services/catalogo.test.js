@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 
 import { ApiError, api } from "./api.js";
+import { limpiarCacheAdmin } from "./adminCache.js";
 import {
   actualizarFamiliaOlfativa,
   crearFamiliaOlfativa,
@@ -21,6 +22,7 @@ beforeEach(() => {
   api.post = postOriginal;
   api.patch = patchOriginal;
   api.delete = deleteOriginal;
+  limpiarCacheAdmin();
 });
 
 afterEach(() => {
@@ -28,6 +30,7 @@ afterEach(() => {
   api.post = postOriginal;
   api.patch = patchOriginal;
   api.delete = deleteOriginal;
+  limpiarCacheAdmin();
 });
 
 test("lista las familias olfativas reales", async () => {

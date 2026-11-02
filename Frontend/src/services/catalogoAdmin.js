@@ -1,4 +1,9 @@
 import { api } from "./api.js";
+import {
+  TTL_ADMIN,
+  invalidarCacheAdmin,
+  obtenerConCache,
+} from "./adminCache.js";
 
 function extraerLista(datos) {
   if (Array.isArray(datos)) return datos;
@@ -7,11 +12,20 @@ function extraerLista(datos) {
 }
 
 export async function listarProductosAdmin({ signal } = {}) {
-  const { data } = await api.get("/catalogo/productos/admin/", {
-    signal,
-  });
+  return obtenerConCache(
+    "catalogo:productos:admin",
+    async () => {
+      const { data } = await api.get(
+        "/catalogo/productos/admin/",
+      );
 
-  return extraerLista(data);
+      return extraerLista(data);
+    },
+    {
+      ttl: TTL_ADMIN.catalogo,
+      signal,
+    },
+  );
 }
 
 export function construirPayloadProducto(formulario) {
@@ -73,6 +87,7 @@ export async function crearProducto({
     : construirPayloadProducto(formulario);
 
   const { data } = await api.post("/catalogo/productos/", payload);
+  invalidarCacheAdmin();
   return data;
 }
 
@@ -100,6 +115,7 @@ export async function actualizarProducto(
     `/catalogo/productos/${id}/`,
     payload
   );
+  invalidarCacheAdmin();
 
   return data;
 }
@@ -109,6 +125,7 @@ export async function actualizarActivo(id, activo) {
     `/catalogo/productos/${id}/`,
     { activo: Boolean(activo) }
   );
+  invalidarCacheAdmin();
 
   return data;
 }

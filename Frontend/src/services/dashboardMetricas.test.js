@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 
 import { ApiError, api } from "./api.js";
+import { limpiarCacheAdmin } from "./adminCache.js";
 import {
   obtenerResumenDashboard,
   validarMesDashboard,
@@ -61,10 +62,12 @@ const resumen = {
 
 beforeEach(() => {
   api.get = getOriginal;
+  limpiarCacheAdmin();
 });
 
 afterEach(() => {
   api.get = getOriginal;
+  limpiarCacheAdmin();
 });
 
 test("consume el endpoint agregado con el mes seleccionado", async () => {
@@ -85,23 +88,33 @@ test("consume el endpoint agregado con el mes seleccionado", async () => {
   assert.equal(datos, resumen);
 });
 
-test("envía la señal para cancelar la consulta del periodo", async () => {
+test("cancela la espera del periodo sin romper la caché", async () => {
   const controlador = new AbortController();
-  let configuracion = null;
+  let resolver = null;
+  let iniciar = null;
+  const iniciado = new Promise((resolve) => {
+    iniciar = resolve;
+  });
 
-  api.get = async (url, config) => {
-    configuracion = config;
-    return { data: resumen };
-  };
+  api.get = () =>
+    new Promise((resolve) => {
+      resolver = resolve;
+      iniciar();
+    });
 
-  await obtenerResumenDashboard("2026-10", {
+  const promesa = obtenerResumenDashboard("2026-10", {
     signal: controlador.signal,
   });
 
-  assert.equal(
-    configuracion.signal,
-    controlador.signal,
+  await iniciado;
+  controlador.abort();
+
+  await assert.rejects(
+    promesa,
+    (error) => error?.isCanceled === true,
   );
+
+  resolver({ data: resumen });
 });
 
 test("rechaza periodos con formato inválido antes de llamar a la API", async () => {

@@ -6,6 +6,7 @@ import {
   obtenerPerfil,
 } from "../services/auth";
 import { setAuthExpiredHandler } from "../services/api";
+import { limpiarCacheAdmin } from "../services/adminCache.js";
 import {
   cerrarNotificaciones,
   leerTokenLocal,
@@ -37,6 +38,7 @@ export function AuthProvider({ children }) {
 
   const cerrarSesion = useCallback(() => {
     limpiarNotificacionesDeSesion();
+    limpiarCacheAdmin();
     clearTokens();
     setUser(null);
     setStatus("anonymous");
@@ -45,6 +47,7 @@ export function AuthProvider({ children }) {
 
   const expirarSesion = useCallback(() => {
     limpiarNotificacionesDeSesion();
+    limpiarCacheAdmin();
     clearTokens();
     setUser(null);
     setStatus("anonymous");
@@ -60,6 +63,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async ({ username, password }) => {
     setAuthNotice("");
+    limpiarCacheAdmin();
 
     const tokens = await iniciarSesion({ username, password });
 

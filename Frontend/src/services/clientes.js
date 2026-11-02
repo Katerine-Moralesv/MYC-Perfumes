@@ -1,5 +1,10 @@
 import { api } from "./api.js";
 import {
+  TTL_ADMIN,
+  invalidarCacheAdmin,
+  obtenerConCache,
+} from "./adminCache.js";
+import {
   esFechaFutura,
   esFechaISO,
 } from "./fechas.js";
@@ -116,11 +121,17 @@ export function construirPayloadCliente({
 }
 
 export async function listarClientes({ signal } = {}) {
-  const respuesta = await api.get("/finanzas/clientes/", {
-    signal,
-  });
-
-  return extraerLista(respuesta.data);
+  return obtenerConCache(
+    "clientes:lista",
+    async () => {
+      const respuesta = await api.get("/finanzas/clientes/");
+      return extraerLista(respuesta.data);
+    },
+    {
+      ttl: TTL_ADMIN.listas,
+      signal,
+    },
+  );
 }
 
 export async function crearCliente(datos) {
@@ -135,6 +146,7 @@ export async function crearCliente(datos) {
       "/finanzas/clientes/",
       payload,
     );
+    invalidarCacheAdmin();
 
     return respuesta.data;
   });
@@ -144,23 +156,43 @@ export async function listarVentas({
   signal,
   conPendientes = false,
 } = {}) {
-  const respuesta = await api.get("/finanzas/ventas/", {
-    signal,
-    params: conPendientes
-      ? { con_pendientes: "1" }
-      : undefined,
-  });
+  const clave = conPendientes
+    ? "ventas:listas:pendientes"
+    : "ventas:listas";
 
-  return extraerLista(respuesta.data);
+  return obtenerConCache(
+    clave,
+    async () => {
+      const respuesta = await api.get("/finanzas/ventas/", {
+        params: conPendientes
+          ? { con_pendientes: "1" }
+          : undefined,
+      });
+
+      return extraerLista(respuesta.data);
+    },
+    {
+      ttl: TTL_ADMIN.listas,
+      signal,
+    },
+  );
 }
 
 export async function listarResumenClientes({ signal } = {}) {
-  const respuesta = await api.get(
-    "/finanzas/clientes/resumen/",
-    { signal },
-  );
+  return obtenerConCache(
+    "clientes:resumen",
+    async () => {
+      const respuesta = await api.get(
+        "/finanzas/clientes/resumen/",
+      );
 
-  return extraerLista(respuesta.data);
+      return extraerLista(respuesta.data);
+    },
+    {
+      ttl: TTL_ADMIN.listas,
+      signal,
+    },
+  );
 }
 
 export async function obtenerResumenCliente(clienteId, { signal } = {}) {
@@ -170,12 +202,20 @@ export async function obtenerResumenCliente(clienteId, { signal } = {}) {
     throw new Error("El identificador del cliente no es válido.");
   }
 
-  const respuesta = await api.get(
-    `/finanzas/clientes/${id}/resumen/`,
-    { signal },
-  );
+  return obtenerConCache(
+    `clientes:resumen:${id}`,
+    async () => {
+      const respuesta = await api.get(
+        `/finanzas/clientes/${id}/resumen/`,
+      );
 
-  return respuesta.data;
+      return respuesta.data;
+    },
+    {
+      ttl: TTL_ADMIN.listas,
+      signal,
+    },
+  );
 }
 
 export async function registrarAbono(
@@ -229,6 +269,7 @@ export async function registrarAbono(
         },
       },
     );
+    invalidarCacheAdmin();
 
     return respuesta.data;
   });

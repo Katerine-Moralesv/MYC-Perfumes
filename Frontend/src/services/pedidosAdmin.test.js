@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 
 import { ApiError, api } from "./api.js";
+import { limpiarCacheAdmin } from "./adminCache.js";
 import {
   OperacionEnCursoError,
   cambiarEstadoPedido,
@@ -22,11 +23,13 @@ const postOriginal = api.post;
 beforeEach(() => {
   api.get = getOriginal;
   api.post = postOriginal;
+  limpiarCacheAdmin();
 });
 
 afterEach(() => {
   api.get = getOriginal;
   api.post = postOriginal;
+  limpiarCacheAdmin();
 });
 
 test("lista los pedidos reales del panel administrativo", async () => {
@@ -423,5 +426,37 @@ test("mantiene la confirmación comercial sin crear una venta", async () => {
   assert.equal(pedido.estado, "confirmado");
   assert.equal(pedido.venta, null);
   assert.equal(pedido.saldo, "150000.00");
+});
+
+test("una mutación invalida la lista cacheada de pedidos", async () => {
+  let lecturas = 0;
+  let escrituras = 0;
+
+  api.get = async () => {
+    lecturas += 1;
+    return {
+      data: [{ id: 1, estado: "pendiente" }],
+    };
+  };
+
+  api.post = async () => {
+    escrituras += 1;
+    return {
+      data: { id: 1, estado: "preparando" },
+    };
+  };
+
+  await listarPedidos();
+  await listarPedidos();
+
+  assert.equal(lecturas, 1);
+
+  await cambiarEstadoPedido(1, "preparando");
+
+  assert.equal(escrituras, 1);
+
+  await listarPedidos();
+
+  assert.equal(lecturas, 2);
 });
 

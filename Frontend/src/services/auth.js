@@ -1,4 +1,5 @@
 import { api } from "./api.js";
+import { invalidarCacheAdmin } from "./adminCache.js";
 
 export async function iniciarSesion({ username, password }) {
   const { data } = await api.post("/auth/login/", {
@@ -16,6 +17,7 @@ export async function obtenerPerfil() {
 
 export async function actualizarPerfil(datos) {
   const { data } = await api.patch("/usuarios/perfil/", datos);
+  invalidarCacheAdmin();
   return data;
 }
 

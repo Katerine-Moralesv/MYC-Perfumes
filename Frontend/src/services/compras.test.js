@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, test } from "node:test";
 
 import { ApiError, api } from "./api.js";
+import { limpiarCacheAdmin } from "./adminCache.js";
 import {
   calcularTotalCompra,
   construirPayloadCompra,
@@ -20,11 +21,13 @@ const postOriginal = api.post;
 beforeEach(() => {
   api.get = getOriginal;
   api.post = postOriginal;
+  limpiarCacheAdmin();
 });
 
 afterEach(() => {
   api.get = getOriginal;
   api.post = postOriginal;
+  limpiarCacheAdmin();
 });
 
 test("lista compras reales desde Django", async () => {

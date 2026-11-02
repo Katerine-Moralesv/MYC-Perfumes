@@ -217,6 +217,11 @@ export default function Configuracion({ notificaciones } = {}) {
 
     try {
       await actualizarPerfil({ username, email });
+
+      if (isAdmin) {
+        await recargarAdministradores();
+      }
+
       setTipoMensaje("exito");
       setMensaje("Datos actualizados correctamente.");
     } catch (error) {

@@ -32,8 +32,14 @@ test("App mantiene un único listener foreground para administradores", () => {
   assert.doesNotMatch(dashboard, /useNotificacionesAdmin\(/);
   assert.match(
     dashboard,
-    /Configuracion notificaciones=\{notificaciones\}/,
+    /Configuracion[\s\S]*?notificaciones=\{notificaciones\}/,
   );
+});
+
+test("la caché administrativa se limpia al cambiar de sesión", () => {
+  assert.match(auth, /limpiarCacheAdmin/);
+  assert.match(dashboard, /invalidarCacheAdmin/);
+  assert.match(dashboard, /versionSeccion/);
 });
 
 test("App persiste, recupera y limpia el pedido pendiente", () => {

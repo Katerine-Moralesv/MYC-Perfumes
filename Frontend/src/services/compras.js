@@ -1,4 +1,9 @@
 import { api } from "./api.js";
+import {
+  TTL_ADMIN,
+  invalidarCacheAdmin,
+  obtenerConCache,
+} from "./adminCache.js";
 import { crearClaveIdempotencia } from "./idempotencia.js";
 
 function extraerLista(datos) {
@@ -8,19 +13,31 @@ function extraerLista(datos) {
 }
 
 export async function listarCompras({ signal } = {}) {
-  const { data } = await api.get("/finanzas/compras/", {
-    signal,
-  });
-
-  return extraerLista(data);
+  return obtenerConCache(
+    "compras:lista",
+    async () => {
+      const { data } = await api.get("/finanzas/compras/");
+      return extraerLista(data);
+    },
+    {
+      ttl: TTL_ADMIN.listas,
+      signal,
+    },
+  );
 }
 
 export async function listarProveedores({ signal } = {}) {
-  const { data } = await api.get("/finanzas/proveedores/", {
-    signal,
-  });
-
-  return extraerLista(data);
+  return obtenerConCache(
+    "proveedores:lista",
+    async () => {
+      const { data } = await api.get("/finanzas/proveedores/");
+      return extraerLista(data);
+    },
+    {
+      ttl: TTL_ADMIN.catalogo,
+      signal,
+    },
+  );
 }
 
 export async function crearProveedor({
@@ -40,6 +57,7 @@ export async function crearProveedor({
       telefono: String(telefono || "").trim(),
     }
   );
+  invalidarCacheAdmin();
 
   return data;
 }
@@ -252,6 +270,7 @@ export async function registrarCompra(datos) {
       headers: { "Idempotency-Key": clave },
     },
   );
+  invalidarCacheAdmin();
 
   return data;
 }
@@ -328,6 +347,7 @@ export async function registrarRecepcionCompra(
       headers: { "Idempotency-Key": clave },
     },
   );
+  invalidarCacheAdmin();
 
   return data;
 }

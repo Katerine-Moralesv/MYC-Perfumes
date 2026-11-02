@@ -1,4 +1,5 @@
 import { api } from "./api.js";
+import { invalidarCacheAdmin } from "./adminCache.js";
 import {
   esFechaFutura,
   esFechaISO,
@@ -207,6 +208,7 @@ export async function crearVenta(datos) {
         },
       );
 
+      invalidarCacheAdmin();
       return respuesta.data;
     })
     .finally(() => {

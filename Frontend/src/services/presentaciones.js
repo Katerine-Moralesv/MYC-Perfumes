@@ -1,4 +1,9 @@
 import { api } from "./api.js";
+import {
+  TTL_ADMIN,
+  invalidarCacheAdmin,
+  obtenerConCache,
+} from "./adminCache.js";
 
 const PORCENTAJES_VALIDOS = new Set([40, 60, 70, 80]);
 
@@ -12,18 +17,32 @@ export async function listarPresentaciones({
   producto,
   signal,
 } = {}) {
-  const config = { signal };
+  const clave =
+    producto != null && producto !== ""
+      ? `catalogo:presentaciones:${producto}`
+      : "catalogo:presentaciones";
 
-  if (producto != null && producto !== "") {
-    config.params = { producto };
-  }
+  return obtenerConCache(
+    clave,
+    async () => {
+      const config = {};
 
-  const { data } = await api.get(
-    "/catalogo/presentaciones/",
-    config
+      if (producto != null && producto !== "") {
+        config.params = { producto };
+      }
+
+      const { data } = await api.get(
+        "/catalogo/presentaciones/",
+        config,
+      );
+
+      return extraerLista(data);
+    },
+    {
+      ttl: TTL_ADMIN.catalogo,
+      signal,
+    },
   );
-
-  return extraerLista(data);
 }
 
 export function construirPayloadPresentacion({
@@ -57,6 +76,7 @@ export async function crearPresentacion(datos) {
     "/catalogo/presentaciones/",
     payload
   );
+  invalidarCacheAdmin();
 
   return data;
 }
@@ -69,6 +89,7 @@ export async function actualizarActivoPresentacion(
     `/catalogo/presentaciones/${id}/`,
     { activo: Boolean(activo) }
   );
+  invalidarCacheAdmin();
 
   return data;
 }

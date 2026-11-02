@@ -67,3 +67,11 @@ test("el Dashboard muestra seis tarjetas y equilibra su distribución", () => {
   assert.match(estilos, /@media \(max-width: 980px\)/);
 });
 
+test("el panel permite actualizar manualmente e invalidar la caché", () => {
+  assert.match(pagina, /actualizarPanel/);
+  assert.match(pagina, /dash-refresh/);
+  assert.match(pagina, /invalidarCacheAdmin/);
+  assert.match(pagina, /versionSeccion/);
+  assert.match(estilos, /\.dash-refresh/);
+});
+

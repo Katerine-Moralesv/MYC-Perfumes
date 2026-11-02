@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, test } from "node:test";
 
 import { ApiError, api } from "./api.js";
+import { limpiarCacheAdmin } from "./adminCache.js";
 import {
   actualizarActivo,
   actualizarProducto,
@@ -36,12 +37,14 @@ beforeEach(() => {
   api.get = getOriginal;
   api.post = postOriginal;
   api.patch = patchOriginal;
+  limpiarCacheAdmin();
 });
 
 afterEach(() => {
   api.get = getOriginal;
   api.post = postOriginal;
   api.patch = patchOriginal;
+  limpiarCacheAdmin();
 });
 
 test("lista productos desde el endpoint administrativo", async () => {

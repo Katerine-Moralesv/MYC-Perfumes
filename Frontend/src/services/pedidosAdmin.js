@@ -1,5 +1,10 @@
 import { api } from "./api.js";
 import {
+  TTL_ADMIN,
+  invalidarCacheAdmin,
+  obtenerConCache,
+} from "./adminCache.js";
+import {
   esFechaFutura,
   esFechaISO,
 } from "./fechas.js";
@@ -99,8 +104,17 @@ function validarFecha(fecha, nombre = "fecha") {
 }
 
 export async function listarPedidos({ signal } = {}) {
-  const respuesta = await api.get("/pedidos/", { signal });
-  return extraerLista(respuesta.data);
+  return obtenerConCache(
+    "pedidos:lista",
+    async () => {
+      const respuesta = await api.get("/pedidos/");
+      return extraerLista(respuesta.data);
+    },
+    {
+      ttl: TTL_ADMIN.listas,
+      signal,
+    },
+  );
 }
 
 export function construirPayloadConfirmacion({
@@ -184,6 +198,7 @@ export async function confirmarPedido(pedidoId, opciones) {
       payload,
     );
 
+    invalidarCacheAdmin();
     return respuesta.data;
   });
 }
@@ -233,6 +248,7 @@ export async function registrarAnticipo(
       },
     );
 
+    invalidarCacheAdmin();
     return respuesta.data;
   });
 }
@@ -253,6 +269,7 @@ export async function completarVentaPedido(
         : undefined,
     );
 
+    invalidarCacheAdmin();
     return respuesta.data;
   });
 }
@@ -319,6 +336,7 @@ export async function cancelarPedido(
         : undefined,
     );
 
+    invalidarCacheAdmin();
     return respuesta.data;
   });
 }
@@ -337,6 +355,7 @@ export async function cambiarEstadoPedido(pedidoId, estado) {
       { estado: valor },
     );
 
+    invalidarCacheAdmin();
     return respuesta.data;
   });
 }
@@ -355,6 +374,7 @@ export async function rechazarPedido(pedidoId, motivo = "") {
       { motivo: texto },
     );
 
+    invalidarCacheAdmin();
     return respuesta.data;
   });
 }
