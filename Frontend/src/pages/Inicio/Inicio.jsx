@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import logoMYC from "../../assets/logo-myc.webp";
 import fondoFloral from "../../assets/fondo-floral.webp";
-import fotoInicio from "../../assets/foto-inicio.webp";
-import fotoNosotros from "../../assets/foto-nosotros.webp";
+import fotoInicio from "../../assets/foto-inicio.png";
+import fotoNosotros from "../../assets/foto-nosotros.png";
 import "./Inicio.css";
 
 import {
