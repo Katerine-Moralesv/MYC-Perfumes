@@ -67,26 +67,41 @@ def enviar_notificacion_pedido(pedido):
     Envía la notificación a todos los dispositivos activos de los
     administradores. Nunca lanza excepciones hacia la creación del
     pedido.
+
+    Cada salida temprana queda registrada en el log para poder saber en
+    qué punto se detuvo el flujo.
     """
+
+    pedido_id = getattr(pedido, "pk", None)
 
     try:
         tokens = obtener_tokens_administradores()
     except Exception:
         logger.exception(
-            "No se pudieron consultar los dispositivos FCM."
+            "No se pudieron consultar los dispositivos FCM "
+            "(pedido %s).",
+            pedido_id,
         )
         return 0
 
     if not tokens:
+        logger.warning(
+            "Pedido %s: no hay dispositivos FCM activos de "
+            "administradores; no se envió ninguna notificación. "
+            "Un administrador debe iniciar sesión y activar las "
+            "notificaciones en el navegador.",
+            pedido_id,
+        )
         return 0
 
     app_firebase = obtener_app_firebase()
 
     if app_firebase is None:
         logger.warning(
-            "Firebase Admin no está configurado; "
+            "Firebase Admin no está configurado "
+            "(revisa FIREBASE_CREDENTIALS_BASE64); "
             "no se envió la notificación del pedido %s.",
-            getattr(pedido, "pk", None),
+            pedido_id,
         )
         return 0
 
@@ -111,7 +126,7 @@ def enviar_notificacion_pedido(pedido):
     except Exception:
         logger.exception(
             "Falló el envío de la notificación del pedido %s.",
-            getattr(pedido, "pk", None),
+            pedido_id,
         )
         return 0
 
@@ -125,10 +140,21 @@ def enviar_notificacion_pedido(pedido):
 
         if _token_invalido(excepcion):
             tokens_invalidos.append(token)
-        else:
-            logger.warning(
-                "No se pudo enviar la notificación a un dispositivo: %s",
+            logger.info(
+                "Pedido %s: token FCM inválido o caducado (%s); "
+                "se desactivará el dispositivo.",
+                pedido_id,
                 type(excepcion).__name__,
+            )
+        else:
+            # Se registra el tipo y el mensaje de Firebase, nunca el
+            # token completo.
+            logger.warning(
+                "Pedido %s: no se pudo enviar la notificación a un "
+                "dispositivo: %s: %s",
+                pedido_id,
+                type(excepcion).__name__,
+                excepcion,
             )
 
     if tokens_invalidos:
@@ -136,4 +162,14 @@ def enviar_notificacion_pedido(pedido):
             token__in=tokens_invalidos,
         ).update(activo=False)
 
-    return getattr(respuesta, "success_count", 0)
+    enviados = getattr(respuesta, "success_count", 0)
+
+    logger.info(
+        "Pedido %s: notificación enviada a %s de %s dispositivo(s) "
+        "de administradores.",
+        pedido_id,
+        enviados,
+        len(tokens),
+    )
+
+    return enviados

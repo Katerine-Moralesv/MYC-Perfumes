@@ -69,23 +69,9 @@ async function mostrarNotificacion(payload) {
   });
 }
 
-const configuracion = leerConfiguracion();
-
-if (configuracion) {
-  try {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(configuracion);
-    }
-
-    const messaging = firebase.messaging();
-
-    messaging.onBackgroundMessage((payload) => {
-      mostrarNotificacion(payload);
-    });
-  } catch {
-    // Si Firebase no se inicializa, se intenta el evento push.
-  }
-} else {
+// Respaldo: muestra la notificación leyendo el evento push directamente.
+// Se usa solo si Firebase no pudo inicializarse en el Service Worker.
+function registrarPushDeRespaldo() {
   self.addEventListener("push", (event) => {
     if (!event.data) return;
 
@@ -99,6 +85,36 @@ if (configuracion) {
 
     event.waitUntil(mostrarNotificacion(payload));
   });
+}
+
+function inicializarFirebase(configuracion) {
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(configuracion);
+    }
+
+    const messaging = firebase.messaging();
+
+    // Se devuelve la promesa para que Firebase espere a que la
+    // notificación se muestre antes de dar por terminado el evento push.
+    messaging.onBackgroundMessage((payload) =>
+      mostrarNotificacion(payload),
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "[MYC SW] No se pudo inicializar Firebase Messaging:",
+      error,
+    );
+    return false;
+  }
+}
+
+const configuracion = leerConfiguracion();
+
+if (!configuracion || !inicializarFirebase(configuracion)) {
+  registrarPushDeRespaldo();
 }
 
 self.addEventListener("notificationclick", (event) => {

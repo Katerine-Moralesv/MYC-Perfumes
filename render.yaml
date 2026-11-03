@@ -32,6 +32,9 @@ services:
         sync: false
       - key: WEBHOOK_TOKEN
         sync: false
+      # Cuenta de servicio de Firebase en Base64 (privada, solo backend).
+      - key: FIREBASE_CREDENTIALS_BASE64
+        sync: false
 
       - key: DB_NAME
         value: postgres
