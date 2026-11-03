@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import logoMYC from "../../assets/logo-myc.webp";
 import fondoFloral from "../../assets/fondo-floral.webp";
+import fotoInicio from "../../assets/foto-inicio.webp";
+import fotoNosotros from "../../assets/foto-nosotros.webp";
 import "./Inicio.css";
 
 import {
@@ -1339,21 +1341,12 @@ function Inicio({ onVerCatalogo, onAdminLogin }) {
     [productos]
   );
 
-  const productoHero = productosPublicados[0] || null;
-  const heroImagen =
-    !heroError && productoHero?.imagen
-      ? productoHero.imagen
-      : fondoFloral;
-  const heroAlt = productoHero
-    ? `Fotografía de ${productoHero.nombre}`
-    : "Composición floral de MYC Perfumes";
-  const nosotrosHeroImagen =
-    !nosotrosImageError && productoHero?.imagen
-      ? productoHero.imagen
-      : fondoFloral;
-  const nosotrosHeroAlt = productoHero
-    ? `Fotografía de ${productoHero.nombre}`
-    : "Composición floral de MYC Perfumes";
+  // Fotos fijas del inicio y de Nosotros. Si alguna no carga,
+  // se muestra la imagen floral de respaldo.
+  const heroImagen = heroError ? fondoFloral : fotoInicio;
+  const heroAlt = "MYC Perfumes";
+  const nosotrosHeroImagen = nosotrosImageError ? fondoFloral : fotoNosotros;
+  const nosotrosHeroAlt = "MYC Perfumes";
 
   const opcionesPublico = useMemo(
     () => [...new Set(["Todos", ...categorias])],
